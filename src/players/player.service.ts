@@ -19,10 +19,9 @@ export class PlayerService {
       return await newPlayer.save();
     } catch (error) {
       if (error.code === 11000) {
-        if
-          (error.keyValue.playerNumber) {
+        console.log(error);
+        if(error.keyValue.playerNumber) {
           throw new BadRequestException(`playerNumber ${playerDto.playerNumber} already exists!`);
-
         } else {
           (error.keyValue.position)
           throw new BadRequestException(` ${playerDto.position} already exists!`);
