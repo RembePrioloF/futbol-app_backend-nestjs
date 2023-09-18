@@ -1,34 +1,28 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserRole } from "../dto/roles.enum";
 
 @Entity('users')
-export class User {
+export class UpdateUser {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ nullable: false, unique: true })
-    email: string;
-
-    @Column()
+    @Column({ nullable: false, })
     name: string;
 
-    @Column({ nullable: false, })
+    @Column()
     password: string;
 
     @Column({ default: true })
     isActive: boolean;
 
-    @Column({ type: 'enum', enum: UserRole })
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.MODERATOR })
     role: UserRole; // Utiliza el enum para el campo de rol
 
-    @CreateDateColumn({ type: "timestamp" })
-    createdAt: Date;
-
-    /* @UpdateDateColumn({
+    @UpdateDateColumn({
         type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)",
         onUpdate: "CURRENT_TIMESTAMP(6)"
     })
-    updatedAt: Date; */
+    updatedAt: Date;
 
 }

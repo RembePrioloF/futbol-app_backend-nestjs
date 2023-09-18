@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectModel } from '@nestjs/mongoose';
-import * as bcryptjs from "bcryptjs";
-import { Model } from 'mongoose';
-import { CreateUserDto, LoginDto, RegisterUserDto, UpdateAuthDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcryptjs from 'bcryptjs';
+import { Repository } from 'typeorm';
+import { LoginDto, UserDto } from './dto';
 import { User } from './entities/user.entity';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { LoginResponse } from './interfaces/login-response';
@@ -11,82 +11,122 @@ import { LoginResponse } from './interfaces/login-response';
 @Injectable()
 export class AuthService {
 
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 10;
+    return bcryptjs.hashSync(password, saltRounds);
+  }
+
   constructor(
-    @InjectModel(User.name)
-    private userModel: Model<User>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private jwtService: JwtService,
   ) { }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-
-    try {
-      const { password, ...userData } = createUserDto;
-      const newUser = new this.userModel({
-        password: bcryptjs.hashSync(password, 10),
-        ...userData
-      });
-      await newUser.save();
-      const { password: _, ...user } = newUser.toJSON();
-      return user;
-
-    } catch (error) {
-      if (error.code === 11000) {
-        throw new BadRequestException(`${createUserDto.email} already exists!`)
-      }
-      throw new InternalServerErrorException('Something terribe happen!!!');
-    }
-
+  async create(userDto: UserDto): Promise<User> {
+    return await this.userRepository.save(userDto);
   }
 
-  async register(registerDto: RegisterUserDto): Promise<LoginResponse> {
-    const user = await this.create(registerDto);
-    return {
-      user: user,
-      token: this.getJwtToken({ id: user._id })
+  public async registerUser(registerUser: UserDto) {
+    try {
+      const createdUser = await this.create({
+        ...registerUser,
+        password: await this.hashPassword(registerUser.password)
+      });
+      createdUser.password = undefined;
+      return createdUser;
+    } catch (error) {
+      console.log(error);
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new HttpException(`The user with email ${registerUser.email} already exists!`, HttpStatus.BAD_REQUEST);
+      }
+      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {
     const { email, password } = loginDto;
-    const user = await this.userModel.findOne({ email });
-
+    const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new UnauthorizedException('Not valid credentials');
     }
-
     if (!bcryptjs.compareSync(password, user.password)) {
       throw new UnauthorizedException('Not valid credentials');
     }
 
-    const { password: _, ...rest } = user.toJSON();
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password; // Elimina la propiedad 'password'
 
     return {
-      user: rest,
+      user: userWithoutPassword,
       token: this.getJwtToken({ id: user.id }),
     }
   }
 
-  findAll(): Promise<User[]> {
-    return this.userModel.find();
+  /* async validateUser(loginDto: LoginDto): Promise<LoginResponse> {
+    const { email, password } = loginDto;
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (user && user.password === password) {
+      return user;
+    }
+    return null;
+  } */
+
+  async findAllUsers(): Promise<Partial<User>[]> {
+    const users = await this.userRepository.find();
+
+    if (!users || users.length == 0) {
+      throw new NotFoundException('Users data not found!');
+    }
+    return users.map((user) => {
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
   }
 
-  async findUserById(id: string) {
-    const user = await this.userModel.findById(id);
-    const { password, ...rest } = user.toJSON();
-    return rest;
+  async findUserById(id: string): Promise<Partial<User> | undefined> {
+    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
+
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password; // Elimina la propiedad 'password'
+
+    if (!user)
+      throw new NotFoundException(`User #${id} not found`);
+
+    return userWithoutPassword;
   }
 
+  async updateUser(id: number, updateUserDto: UserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
+    if (!user) {
+      throw new NotFoundException(`User #${id} not found`);
+    }
+    // Actualiza todos los campos del usuario según el DTO
+    Object.assign(user, updateUserDto);
+    // Encripta la contraseña antes de guardarla (si se proporcionó)
+    if (updateUserDto.password) {
+      user.password = await this.hashPassword(updateUserDto.password);
+    }
+    const userWithoutPassword = { ...user };
+    delete userWithoutPassword.password; // Elimina la propiedad 'password'
+    await this.userRepository.save(user); // Guarda la actualización en la base de datos
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+    return userWithoutPassword; // Devuelve el usuario actualizado
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+  async disableUser(id: number) {
+    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!user)
+      throw new NotFoundException(`User #${id} not found`);
+
+    if (user.isActive === false)
+      throw new NotFoundException(`User #${user.name} is already disabled`);
+
+    user.isActive = false; // Cambia el estado isActive a false
+    await this.userRepository.save(user); // Guarda la actualización en la base de datos
+
+    return { message: `User #${user.name} disabled` };
   }
 
   getJwtToken(payload: JwtPayload) {
