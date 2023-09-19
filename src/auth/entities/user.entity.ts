@@ -22,13 +22,10 @@ export class User {
     @Column({ type: 'enum', enum: UserRole })
     role: UserRole; // Utiliza el enum para el campo de rol
 
-    @CreateDateColumn({ type: "timestamp" })
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
-    @UpdateDateColumn({
-        type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)",
-        onUpdate: "CURRENT_TIMESTAMP(6)"
-    })
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updatedAt: Date;
 
 }

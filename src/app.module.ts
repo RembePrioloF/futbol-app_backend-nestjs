@@ -3,11 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from './config/constants';
-/* 
-import { PlayerModule } from './players/player.module';
 import { TeamModule } from './teams/team.module';
-import { TournamModule } from './tournaments/tournam.module';
- */
 
 @Module({
   imports: [
@@ -16,7 +12,6 @@ import { TournamModule } from './tournaments/tournam.module';
       isGlobal: true
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
         host: configService.get<string>(DB_HOST),
@@ -26,14 +21,13 @@ import { TournamModule } from './tournaments/tournam.module';
         database: configService.get<string>(DB_DATABASE),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         //synchronize: true,
-        //logging: false
       }),
       inject: [ConfigService],
     }),
     AuthModule,
+    TeamModule,
     /* 
    TournamModule,
-    TeamModule,
     PlayerModule */
   ],
   controllers: [],

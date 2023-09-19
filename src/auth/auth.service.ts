@@ -100,31 +100,34 @@ export class AuthService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
+    if (!user) {
+      throw new NotFoundException(`The User with ID:${id} not found`);
+    }
     try {
-      const user = await this.userRepository.findOne({ where: { id: id.toString() } });
-      if (!user) {
-        throw new NotFoundException(`User #${id} not found`);
-      }
-      // Actualiza todos los campos del usuario según el DTO
+      // Actualiza los campos del usuario según el DTO
       Object.assign(user, updateUserDto);
       // Encripta la contraseña antes de guardarla (si se proporcionó)
       if (updateUserDto.password) {
         user.password = await this.hashPassword(updateUserDto.password);
       }
-      const userWithoutPassword = { ...user };
-      delete userWithoutPassword.password; // Elimina la propiedad 'password'
-      await this.userRepository.save(user); // Guarda la actualización en la base de datos
-      return userWithoutPassword; // Devuelve el usuario actualizado
+      // Guarda la actualización en la base de datos
+      const updatedUser = await this.userRepository.save(user);
+      // Devuelve el usuario actualizado sin la contraseña
+      const userWithout: User = { ...updatedUser };
+      delete userWithout.password;
+      delete userWithout.createdAt;
+      return userWithout;
     } catch (error) {
+      console.log(error);
       if (error?.code === 'WARN_DATA_TRUNCATED') {
-        throw new HttpException(`The role #${updateUserDto.role} not exists!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`The role:${updateUserDto.role} not exists!`, HttpStatus.BAD_REQUEST);
       }
     }
   }
 
   async disableUser(id: number) {
     const user = await this.userRepository.findOne({ where: { id: id.toString() } });
-
     if (!user)
       throw new NotFoundException(`User #${id} not found`);
 
