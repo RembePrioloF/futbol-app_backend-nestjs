@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { Repository } from 'typeorm';
-import { LoginDto, UserDto } from './dto';
+import { LoginDto, UpdateUserDto, UserDto } from './dto';
 import { User } from './entities/user.entity';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { LoginResponse } from './interfaces/login-response';
@@ -38,6 +38,9 @@ export class AuthService {
       console.log(error);
       if (error?.code === 'ER_DUP_ENTRY') {
         throw new HttpException(`The user with email ${registerUser.email} already exists!`, HttpStatus.BAD_REQUEST);
+      }
+      if (error?.code === 'WARN_DATA_TRUNCATED') {
+        throw new HttpException(`The role #${registerUser.role} not exists!`, HttpStatus.BAD_REQUEST);
       }
       throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -96,22 +99,27 @@ export class AuthService {
     return userWithoutPassword;
   }
 
-  async updateUser(id: number, updateUserDto: UserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
-    if (!user) {
-      throw new NotFoundException(`User #${id} not found`);
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    try {
+      const user = await this.userRepository.findOne({ where: { id: id.toString() } });
+      if (!user) {
+        throw new NotFoundException(`User #${id} not found`);
+      }
+      // Actualiza todos los campos del usuario según el DTO
+      Object.assign(user, updateUserDto);
+      // Encripta la contraseña antes de guardarla (si se proporcionó)
+      if (updateUserDto.password) {
+        user.password = await this.hashPassword(updateUserDto.password);
+      }
+      const userWithoutPassword = { ...user };
+      delete userWithoutPassword.password; // Elimina la propiedad 'password'
+      await this.userRepository.save(user); // Guarda la actualización en la base de datos
+      return userWithoutPassword; // Devuelve el usuario actualizado
+    } catch (error) {
+      if (error?.code === 'WARN_DATA_TRUNCATED') {
+        throw new HttpException(`The role #${updateUserDto.role} not exists!`, HttpStatus.BAD_REQUEST);
+      }
     }
-    // Actualiza todos los campos del usuario según el DTO
-    Object.assign(user, updateUserDto);
-    // Encripta la contraseña antes de guardarla (si se proporcionó)
-    if (updateUserDto.password) {
-      user.password = await this.hashPassword(updateUserDto.password);
-    }
-    const userWithoutPassword = { ...user };
-    delete userWithoutPassword.password; // Elimina la propiedad 'password'
-    await this.userRepository.save(user); // Guarda la actualización en la base de datos
-
-    return userWithoutPassword; // Devuelve el usuario actualizado
   }
 
   async disableUser(id: number) {
