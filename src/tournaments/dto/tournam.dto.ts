@@ -1,16 +1,21 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
-export class TeamDto {
+export class TournamDto {
 
     @IsString()
     name: string;
 
     @IsString()
-    @IsOptional()
-    logo: string;
+    location: string;
 
     @IsString()
-    coach: string;
+    league: string;
+
+    @IsString()
+    competitionDays: string;
+
+    @IsString()
+    competitionTime: string;
 
     @IsBoolean()
     @IsOptional()

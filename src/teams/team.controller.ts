@@ -36,7 +36,7 @@ export class TeamController {
   }
 
   @Put('/:id')
-  async updateStudent(@Res() response, @Param('id') id: string, @Body() teamDto: TeamDto) {
+  async updateTeam(@Res() response, @Param('id') id: string, @Body() teamDto: TeamDto) {
     try {
       const existingTeam = await this.teamService.updateTeam(id, teamDto);
       return response.status(HttpStatus.OK).json({
@@ -49,7 +49,7 @@ export class TeamController {
   }
 
   @Delete('/:id')
-  async deleteTournam(@Res() response, @Param('id') id: string) {
+  async deleteTeam(@Res() response, @Param('id') id: string) {
     try {
       const deletedTeam = await this.teamService.deleteTeam(id);
       return response.status(HttpStatus.OK).json({

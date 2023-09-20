@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from '../config/constants';
 import { AuthModule } from './auth/auth.module';
-import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from './config/constants';
+import { PlayerModule } from './players/player.module';
 import { TeamModule } from './teams/team.module';
+import { TournamModule } from './tournaments/tournam.module';
 
 @Module({
   imports: [
@@ -20,15 +22,14 @@ import { TeamModule } from './teams/team.module';
         password: configService.get<string>(DB_PASSWORD),
         database: configService.get<string>(DB_DATABASE),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        //synchronize: true,
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
     AuthModule,
     TeamModule,
-    /* 
-   TournamModule,
-    PlayerModule */
+    TournamModule,
+    PlayerModule
   ],
   controllers: [],
   providers: [],

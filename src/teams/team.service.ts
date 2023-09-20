@@ -19,9 +19,8 @@ export class TeamService {
       return await this.teamRepository.save(newTeam);
     } catch (error) {
       console.log(error);
-
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The team #${teamDto.teamName} already exists!`)
+        throw new BadRequestException(`The team #${teamDto.name} already exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
@@ -37,7 +36,7 @@ export class TeamService {
 
   async findTeamById(id: string): Promise<Team> {
     try {
-      const existingTeam = await this.teamRepository.findOne({ where: { id: id.toString() } });
+      const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
       return existingTeam;
     } catch (error) {
       if (error) {
@@ -48,7 +47,7 @@ export class TeamService {
   }
 
   async updateTeam(id: string, teamData: Partial<Team>): Promise<Team | undefined> {
-    const existingTeam = await this.teamRepository.findOne({ where: { id: id.toString() } });
+    const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
     if (!existingTeam) {
       throw new NotFoundException(`Team with ID ${id} not found`);
     }
@@ -63,18 +62,18 @@ export class TeamService {
   }
 
   async deleteTeam(id: string) {
-    const team = await this.teamRepository.findOne({ where: { id: id.toString() } });
+    const team = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
     if (!team) {
       throw new NotFoundException(`The Team:${id} not found`);
     }
 
     if (team.isActive === false)
-      throw new NotFoundException(`The Team:${team.teamName} is already disabled`);
+      throw new NotFoundException(`The Team:${team.name} is already disabled`);
 
     team.isActive = false; // Cambia el estado isActive a false
     await this.teamRepository.save(team); // Guarda la actualización en la base de datos
 
-    return { message: `The Team:${team.teamName} disabled` };
+    return { message: `The Team:${team.name} disabled` };
   }
 
 }
