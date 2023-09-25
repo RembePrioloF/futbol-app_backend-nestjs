@@ -23,15 +23,19 @@ export class AuthService {
   ) { }
 
   async create(userDto: UserDto): Promise<User> {
+    // Guarda el nuevo usuario en la base de datos
     return await this.userRepository.save(userDto);
   }
 
-  public async registerUser(registerUser: UserDto) {
+  async registerUser(registerUser: UserDto): Promise<User> {
     try {
+      // Crea un nuevo usuario
       const createdUser = await this.create({
         ...registerUser,
-        password: await this.hashPassword(registerUser.password)
+        // Hashea la contraseña antes de crear el usuario
+        password: await this.hashPassword(registerUser.password),
       });
+      // Elimina la contraseña antes de devolver los datos del usuario
       createdUser.password = undefined;
       return createdUser;
     } catch (error) {
@@ -44,7 +48,6 @@ export class AuthService {
       }
       throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
   }
 
   async login(loginDto: LoginDto): Promise<LoginResponse> {

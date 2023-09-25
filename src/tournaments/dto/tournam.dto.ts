@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDate, IsOptional, IsString } from 'class-validator';
 
 export class TournamDto {
 
@@ -12,13 +12,9 @@ export class TournamDto {
     league: string;
 
     @IsString()
-    competitionDays: string;
-
+    startDate: Date;
+  
     @IsString()
-    competitionTime: string;
-
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
+    endDate: Date;
 
 }

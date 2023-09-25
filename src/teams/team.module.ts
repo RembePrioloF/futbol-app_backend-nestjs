@@ -9,6 +9,7 @@ import { TeamService } from './team.service';
 @Module({
   controllers: [TeamController],
   providers: [TeamService],
+  exports: [TeamService],
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Team]),

@@ -1,7 +1,7 @@
 
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TeamModule } from 'src/teams/team.module';
 import { Player } from './entities/player.entity';
 import { PlayerController } from './player.controller';
 import { PlayerService } from './player.service';
@@ -10,8 +10,8 @@ import { PlayerService } from './player.service';
   controllers: [PlayerController],
   providers: [PlayerService],
   imports: [
-    ConfigModule.forRoot(),
     TypeOrmModule.forFeature([Player]),
+    TeamModule,
   ]
 })
 export class PlayerModule { }

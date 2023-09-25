@@ -1,33 +1,40 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Matchup } from './matchup.entity';
-import { PlayerInMatch } from './player_in_match.entity';
+import { Player } from 'src/players/entities/player.entity';
+import { Team } from 'src/teams/entities/team.entity';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Tournam } from '../entities/tournam.entity';
 
 @Entity('matches')
 export class Match {
 
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn()
   matchID: number;
 
   @Column({ type: 'datetime' })
   dateTime: Date;
 
   @Column()
-  location: string;
+  field: string;
 
-  @Column()
-  result: string;
+  @ManyToOne(() => Tournam, (tournam) => tournam.matchs)
+  @JoinColumn({ name: 'tournamId' })
+  tournaments: Tournam;
 
-  @Column()
-  tournamentPhase: string;
+  @ManyToOne(() => Team, (team) => team.localTeam)
+  @JoinColumn({ name: 'localTeamID', referencedColumnName: 'teamId' })
+  localTeam: Team;
 
-  @ManyToOne(() => Tournam, (tournam) => tournam.participations)
-  tournam: Tournam;
+  @ManyToOne(() => Team, (team) => team.visitingTeam)
+  @JoinColumn({ name: 'visitingTeamID', referencedColumnName: 'teamId' })
+  visitingTeam: Team;
 
-  @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.match)
-  playerInMatch: PlayerInMatch[];
+  @ManyToMany(() => Player, (player) => player.matchs)
+  @JoinTable()
+  players: Player[];
 
-  @OneToMany(() => Matchup, (matchup) => matchup.match)
-  matchups: Matchup[];
+  /* @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.matchs)
+  playerInMatchs: PlayerInMatch[];
+
+  @OneToMany(() => Result, (result) => result.matchs)
+  results: Result[]; */
 
 }

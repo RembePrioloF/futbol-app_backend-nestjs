@@ -17,7 +17,7 @@ export class UpdateUser {
     isActive: boolean;
 
     @Column({ type: 'enum', enum: UserRole, default: UserRole.MODERATOR })
-    role: UserRole; // Utiliza el enum para el campo de rol
+    role: UserRole; 
 
     @UpdateDateColumn({
         type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)",

@@ -20,7 +20,7 @@ export class User {
     isActive: boolean;
 
     @Column({ type: 'enum', enum: UserRole })
-    role: UserRole; // Utiliza el enum para el campo de rol
+    role: UserRole; 
 
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { TeamDto } from './dto';
 import { TeamService } from './team.service';
 
@@ -55,6 +55,18 @@ export class TeamController {
       return response.status(HttpStatus.OK).json({
         message: 'Team deleted successfully',
         deletedTeam,
+      });
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Patch('/restore/:id')
+  async restoreTeam(@Res() response, @Param('id') id: string) {
+    try {
+      const teamData = await this.teamService.restoreTeam(id);
+      return response.status(HttpStatus.OK).json({
+        message: 'Team successfully restored', teamData,
       });
     } catch (err) {
       return response.status(err.status).json(err.response);

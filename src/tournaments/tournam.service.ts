@@ -36,15 +36,11 @@ export class TournamService {
   }
 
   async findTournamById(id: string): Promise<Tournam> {
-    try {
-      const existingTournam = await this.tournamRepository.findOne({ where: { tournamId: id.toString() } });
-      return existingTournam;
-    } catch (error) {
-      if (error) {
-        throw new NotFoundException(`The Tournam:${id} not found`);
-      }
-      throw new InternalServerErrorException('Something terribe happen!!!');
+    const existingTournam = await this.tournamRepository.findOne({ where: { tournamId: id.toString() } });
+    if (!existingTournam) {
+      throw new NotFoundException(`The Tournam:${id} not found`);
     }
+    return existingTournam;
   }
 
   async updateTournam(id: string, tournamData: Partial<Tournam>): Promise<Tournam | undefined> {
@@ -67,14 +63,26 @@ export class TournamService {
     if (!tournam) {
       throw new NotFoundException(`The Tournam:${id} not found`);
     }
-
-    if (tournam.isActive === false)
-      throw new NotFoundException(`The Tournam:${tournam.name} is already disabled`);
-
-    tournam.isActive = false; // Cambia el estado isActive a false
-    await this.tournamRepository.save(tournam); // Guarda la actualización en la base de datos
-
+    await this.tournamRepository.softRemove(tournam); // Realiza la eliminación lógica
     return { message: `The Tournam:${tournam.name} disabled` };
+  }
+
+  async restoreTournament(id: string): Promise<Tournam | undefined> {
+    // Busca el torneo eliminado lógicamente por su ID
+    const tournament = await this.tournamRepository.findOne({
+      where: { tournamId: id.toString() },
+      withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
+    });
+    if (!tournament) {
+      throw new NotFoundException(`Tournament with ID ${id} not found.`);
+    }
+    if (tournament.deleteAt == null) {
+      throw new NotFoundException(`Tournament with ID ${id} already restored.`);
+    }
+    // Restaura el torneo estableciendo deleteAt a null
+    tournament.deleteAt = null;
+    // Guarda los cambios en la base de datos
+    return this.tournamRepository.save(tournament);
   }
 
 }

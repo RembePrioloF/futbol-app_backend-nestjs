@@ -1,17 +1,23 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Team } from 'src/teams/entities/team.entity';
+import { Positions } from './positions.enum';
 
 export class PlayerDto {
 
     @IsString()
     name: string;
 
-    @IsNumber()
-    age: number;
+    @IsString()
+    birthDate: Date;
 
     @IsNumber()
     playerNumber: number;
 
     @IsString()
-    position: string;
+    @IsOptional()
+    position: Positions;
+
+    @IsString()
+    team: Team;
 
 }

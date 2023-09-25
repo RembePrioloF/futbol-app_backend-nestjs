@@ -35,15 +35,11 @@ export class TeamService {
   }
 
   async findTeamById(id: string): Promise<Team> {
-    try {
-      const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
-      return existingTeam;
-    } catch (error) {
-      if (error) {
-        throw new NotFoundException(`Team #${id} not found`);
-      }
-      throw new InternalServerErrorException('Something terribe happen!!!');
+    const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
+    if (!existingTeam) {
+      throw new NotFoundException(`Team #${id} not found`);
     }
+    return existingTeam;
   }
 
   async updateTeam(id: string, teamData: Partial<Team>): Promise<Team | undefined> {
@@ -66,14 +62,26 @@ export class TeamService {
     if (!team) {
       throw new NotFoundException(`The Team:${id} not found`);
     }
-
-    if (team.isActive === false)
-      throw new NotFoundException(`The Team:${team.name} is already disabled`);
-
-    team.isActive = false; // Cambia el estado isActive a false
-    await this.teamRepository.save(team); // Guarda la actualización en la base de datos
-
+    await this.teamRepository.softRemove(team); // Realiza la eliminación lógica
     return { message: `The Team:${team.name} disabled` };
+  }
+
+  async restoreTeam(id: string): Promise<Team | undefined> {
+    // Busca el Team eliminado lógicamente por su ID
+    const team = await this.teamRepository.findOne({
+      where: { teamId: id.toString() },
+      withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
+    });
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${id} not found.`);
+    }
+    if (team.deleteAt == null) {
+      throw new NotFoundException(`Team with ID ${id} already restored.`);
+    }
+    // Restaura el Team estableciendo deleteAt a null
+    team.deleteAt = null;
+    // Guarda los cambios en la base de datos
+    return this.teamRepository.save(team);
   }
 
 }

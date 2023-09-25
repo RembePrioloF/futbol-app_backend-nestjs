@@ -1,7 +1,7 @@
 import { Team } from "src/teams/entities/team.entity";
-import { Formation } from "src/tournaments/entity_relationship/formation.entity";
-import { PlayerInMatch } from "src/tournaments/entity_relationship/player_in_match.entity";
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Match } from "src/tournaments/entity_relationship/match.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Positions } from "../dto";
 
 @Entity('players')
 export class Player {
@@ -9,20 +9,17 @@ export class Player {
     @PrimaryGeneratedColumn('uuid')
     playerId: string;
 
-    @Column({ unique: true, nullable: true })
+    @Column({ unique: true })
     name: string;
 
-    @Column({ nullable: true })
-    age: number;
+    @Column({ type: 'date' })
+    birthDate: Date;
 
-    @Column({ unique: true, nullable: true })
+    @Column({ unique: true })
     playerNumber: number;
 
-    @Column({ unique: true, nullable: true })
-    position: string;
-
-    @Column({ default: true })
-    isActive: boolean;
+    @Column({ type: 'enum', enum: Positions })
+    position: Positions;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
@@ -33,14 +30,15 @@ export class Player {
     })
     updatedAt: Date;
 
-    @ManyToMany(() => Team, (team) => team.players)
+    @DeleteDateColumn({ type: "timestamp" })
+    deleteAt: Date;
+
+    @ManyToOne(() => Team, (team) => team.players)
+    @JoinColumn({ name: 'teamId' })
+    team: Team;
+
+    @ManyToMany(() => Match, (match) => match.players)
     @JoinTable()
-    team: Team[];
-
-    @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.player)
-    participationsInMatches: PlayerInMatch[];
-
-    @OneToMany(() => Formation, (formation) => formation.player)
-    formation: Formation[];
+    matchs: Match[];
 
 }

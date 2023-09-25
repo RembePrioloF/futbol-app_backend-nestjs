@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { PlayerDto } from './dto';
 import { PlayerService } from './player.service';
 
@@ -56,6 +56,18 @@ export class PlayerController {
       return response.status(HttpStatus.OK).json({
         message: 'Player deleted successfully',
         deletedPlayer,
+      });
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Patch('/restore/:id')
+  async restorePlayer(@Res() response, @Param('id') id: string) {
+    try {
+      const playerData = await this.playerService.restorePlayer(id);
+      return response.status(HttpStatus.OK).json({
+        message: 'Player successfully restored', playerData,
       });
     } catch (err) {
       return response.status(err.status).json(err.response);

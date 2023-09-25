@@ -1,15 +1,15 @@
-import { Player } from 'src/players/entities/player.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+/* import { Player } from 'src/players/entities/player.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Match } from './match.entity';
 
 @Entity('player_in_match')
 export class PlayerInMatch {
 
-  @PrimaryGeneratedColumn('uuid')
-  playerInMatchId: number;
+  @PrimaryColumn()
+  playerId: number;
 
-  @Column()
-  minutesPlayed: number;
+  @PrimaryColumn()
+  matchID: number;
 
   @Column()
   goalsMarked: number;
@@ -20,10 +20,16 @@ export class PlayerInMatch {
   @Column()
   redCards: number;
 
-  @ManyToOne(() => Player, (player) => player.participationsInMatches)
-  player: Player;
+  @Column()
+  blueCards: number;
 
-  @ManyToOne(() => Match, (match) => match.playerInMatch)
-  match: Match;
-  
+  @ManyToOne(() => Player, (player) => player.playerInMatchs)
+  @JoinColumn({ name: 'playerId' })
+  players: Player;
+
+  @ManyToOne(() => Match, (match) => match.playerInMatchs)
+  @JoinColumn({ name: 'matchID' })
+  matchs: Match;
+
 }
+ */

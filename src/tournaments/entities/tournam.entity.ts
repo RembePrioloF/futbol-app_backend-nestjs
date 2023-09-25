@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Participation } from "../entity_relationship/participation.entity";
+import { Participation } from "src/participation/entities/participation.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Match } from "../entity_relationship/match.entity";
 
 @Entity('tournaments')
 export class Tournam {
@@ -16,14 +17,11 @@ export class Tournam {
     @Column()
     league: string;
 
-    @Column({ type: 'date' }) // Tipo de dato 'date' para MySQL
-    competitionDays: string;
+    @Column('date')
+    startDate: Date;
 
-    @Column({ type: 'time' }) // Tipo de dato 'time' para MySQL
-    competitionTime: string;
-
-    @Column({ default: true })
-    isActive: boolean;
+    @Column('date')
+    endDate: Date;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
@@ -33,6 +31,12 @@ export class Tournam {
         onUpdate: "CURRENT_TIMESTAMP(6)"
     })
     updatedAt: Date;
+
+    @DeleteDateColumn({ type: 'timestamp', nullable: true })
+    deleteAt: Date;
+
+    @OneToMany(() => Match, (match) => match.tournaments)
+    matchs: Match[];
 
     @OneToMany(() => Participation, (participation) => participation.tournam)
     participations: Participation[];
