@@ -1,7 +1,7 @@
 import { Team } from "src/teams/entities/team.entity";
-import { Match } from "src/tournaments/entity_relationship/match.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Positions } from "../dto";
+import { Match } from "src/matches/entities/match.entity";
 
 @Entity('players')
 export class Player {

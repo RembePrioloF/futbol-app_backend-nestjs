@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from '../config/constants';
 import { AuthModule } from './auth/auth.module';
+import { MatchModule } from './matches/match.module';
 import { ParticipationModule } from './participation/participation.module';
 import { PlayerModule } from './players/player.module';
 import { TeamModule } from './teams/team.module';
@@ -32,6 +33,7 @@ import { TournamModule } from './tournaments/tournam.module';
     TournamModule,
     PlayerModule,
     ParticipationModule,
+    MatchModule,
   ],
   controllers: [],
   providers: [],

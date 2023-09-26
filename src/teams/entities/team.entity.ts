@@ -1,6 +1,6 @@
+import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
-import { Match } from "src/tournaments/entity_relationship/match.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('teams')

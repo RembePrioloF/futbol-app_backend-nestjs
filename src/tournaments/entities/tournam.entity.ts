@@ -1,6 +1,6 @@
+import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Match } from "../entity_relationship/match.entity";
 
 @Entity('tournaments')
 export class Tournam {
@@ -35,7 +35,7 @@ export class Tournam {
     @DeleteDateColumn({ type: 'timestamp', nullable: true })
     deleteAt: Date;
 
-    @OneToMany(() => Match, (match) => match.tournaments)
+    @OneToMany(() => Match, (match) => match.tournam)
     matchs: Match[];
 
     @OneToMany(() => Participation, (participation) => participation.tournam)
