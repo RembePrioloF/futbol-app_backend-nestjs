@@ -1,5 +1,6 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { PlayerDto } from './dto';
 import { Player } from './entities/player.entity';
@@ -30,7 +31,10 @@ export class PlayerService {
         }
       }
       // Crea un nuevo jugador
-      const newPlayer = this.playerRepository.create(playerDto);
+      const newPlayer = this.playerRepository.create({
+        ...playerDto,
+        playerId: short(),
+      });
       return await this.playerRepository.save(newPlayer);
     } catch (error) {
       console.error(error);

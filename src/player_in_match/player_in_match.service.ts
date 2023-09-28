@@ -1,56 +1,53 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { MatchService } from 'src/matches/match.service';
+import { PlayerService } from 'src/players/player.service';
 import { Repository } from 'typeorm';
-import { TournamService } from '../tournaments/tournam.service';
-import { MatchDto } from './dto';
-import { Match } from './entities/Match.entity';
-import { TeamService } from 'src/teams/team.service';
+import { PlayerInMatchDto } from './dto';
+import { PlayerInMatch } from './entities/player_in_match.entity';
 
 @Injectable()
-export class MatchService {
+export class PlayerInMatchService {
 
   constructor(
-    @InjectRepository(Match)
-    private readonly matchRepository: Repository<Match>,
-    private readonly tournamService: TournamService,
-    private readonly teamService: TeamService,
+    @InjectRepository(PlayerInMatch)
+    private readonly playerInMatchRepository: Repository<PlayerInMatch>,
+    private readonly matchService: MatchService,
+    private readonly playerService: PlayerService,
   ) { }
 
-  async createMatch(matchDto: MatchDto): Promise<Match> {
-    const { dateMatch, localTeam, visitingTeam, tournam } = matchDto;
-    // Verifica si el torneo existe antes de crear el partido
-    await this.tournamService.findTournamById(String(tournam));
-    await this.teamService.findTeamById(String(localTeam));
-    await this.teamService.findTeamById(String(visitingTeam));
-    if (matchDto.localTeam === matchDto.visitingTeam) {
-      throw new BadRequestException('The team are duplicated');
-    }
+  async createPlayerInMatch(matchDto: PlayerInMatchDto): Promise<PlayerInMatch> {
+    await this.matchService.findMatchById(String(matchDto.match));
+    await this.playerService.findPlayerById(String(matchDto.player));
     try {
       // Crea un nuevo partido
-      const newMatch = this.matchRepository.create({
+      const newMatch = this.playerInMatchRepository.create({
         ...matchDto, id: short(),
       });
-      return await this.matchRepository.save(newMatch);
+      return await this.playerInMatchRepository.save(newMatch);
     } catch (error) {
       console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Match:${matchDto.dateMatch} :${matchDto.localTeam} :${matchDto.visitingTeam} already exists!`)
+        throw new BadRequestException(`The Player: ${matchDto.player} I already made an event at this moment!`)
+      }
+      if (error?.code === 'WARN_DATA_TRUNCATED') {
+        throw new HttpException(`The Match Event #${matchDto.matchEvent} not exists!`, HttpStatus.BAD_REQUEST);
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
   }
 
-  async findAllMatch(): Promise<Match[]> {
-    const matchData = await this.matchRepository.find();
+  async findAllPlayerInMatch(): Promise<PlayerInMatch[]> {
+    const matchData = await this.playerInMatchRepository.find();
     if (!matchData || matchData.length == 0) {
       throw new NotFoundException('Matchents data not found!');
     }
     return matchData;
   }
 
-  async findMatchById(id: string): Promise<Match> {
-    const existingMatch = await this.matchRepository.findOne({
+  async findPlayerInMatchById(id: string): Promise<PlayerInMatch> {
+    const existingMatch = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() },
       relations: ['localTeam', 'visitingTeam', 'tournam'],
     });
@@ -60,8 +57,8 @@ export class MatchService {
     return existingMatch;
   }
 
-  async updateMatch(id: string, matchData: Partial<Match>): Promise<Match | undefined> {
-    const existingMatch = await this.matchRepository.findOne({
+  async updatePlayerInMatch(id: string, matchData: Partial<PlayerInMatch>): Promise<PlayerInMatch | undefined> {
+    const existingMatch = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() }
     });
     if (!existingMatch) {
@@ -71,7 +68,7 @@ export class MatchService {
       // Actualiza las propiedades del torneo con los datos proporcionados
       Object.assign(existingMatch, matchData);
       // Guarda los cambios en la base de datos
-      const updateMatch = await this.matchRepository.save(existingMatch);
+      const updateMatch = await this.playerInMatchRepository.save(existingMatch);
       return updateMatch;
     } catch (error) {
       console.log(error);
@@ -82,24 +79,24 @@ export class MatchService {
         throw new BadRequestException(`The Match1: not exists!`)
       }
       if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-        throw new BadRequestException(`The Match2: not exists!`)
+        throw new BadRequestException(`The Tournam:${matchData} not exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
   }
 
-  async deleteMatch(id: string) {
-    const match = await this.matchRepository.findOne({ where: { id: id.toString() } });
+  async deletePlayerInMatch(id: string) {
+    const match = await this.playerInMatchRepository.findOne({ where: { id: id.toString() } });
     if (!match) {
       throw new NotFoundException(`The Match:${id} not found`);
     }
-    await this.matchRepository.softRemove(match); // Realiza la eliminación lógica
+    await this.playerInMatchRepository.softRemove(match); // Realiza la eliminación lógica
     return { message: `The Match:${match} disabled` };
   }
 
-  async restoreMatchent(id: string): Promise<Match | undefined> {
+  async restoreMatchent(id: string): Promise<PlayerInMatch | undefined> {
     // Busca el partido eliminado lógicamente por su ID
-    const matchent = await this.matchRepository.findOne({
+    const matchent = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() },
       withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
     });
@@ -112,7 +109,7 @@ export class MatchService {
     // Restaura el partido estableciendo deleteAt a null
     matchent.deleteAt = null;
     // Guarda los cambios en la base de datos
-    return this.matchRepository.save(matchent);
+    return this.playerInMatchRepository.save(matchent);
   }
 
 }

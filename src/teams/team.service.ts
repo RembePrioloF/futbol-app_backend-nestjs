@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { TeamDto } from './dto';
 import { Team } from './entities/team.entity';
@@ -15,7 +16,10 @@ export class TeamService {
   async createTeam(teamDto: TeamDto): Promise<Team> {
     try {
       // Crea un nuevo equipo
-      const newTeam = this.teamRepository.create(teamDto);
+      const newTeam = this.teamRepository.create({
+        ...teamDto,
+        teamId: short(),
+      });
       return await this.teamRepository.save(newTeam);
     } catch (error) {
       console.log(error);
@@ -35,9 +39,11 @@ export class TeamService {
   }
 
   async findTeamById(id: string): Promise<Team> {
-    const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
+    const existingTeam = await this.teamRepository.findOne({
+      where: { teamId: id.toString() }
+    });
     if (!existingTeam) {
-      throw new NotFoundException(`Team #${id} not found`);
+      throw new NotFoundException(`Team: ${id} not found`);
     }
     return existingTeam;
   }

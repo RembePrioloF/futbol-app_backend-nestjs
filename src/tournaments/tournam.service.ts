@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { TournamDto } from './dto';
 import { Tournam } from './entities/tournam.entity';
@@ -14,12 +15,13 @@ export class TournamService {
 
   async createTournam(tournamDto: TournamDto): Promise<Tournam> {
     try {
-      // Crea un nuevo torneo
-      const newTournam = this.tournamRepository.create(tournamDto);
+      const newTournam = this.tournamRepository.create({
+        ...tournamDto,
+        tournamId: short(),
+      });
       return await this.tournamRepository.save(newTournam);
     } catch (error) {
       console.log(error);
-
       if (error.code === 'ER_DUP_ENTRY') {
         throw new BadRequestException(`The Tournam:${tournamDto.name} already exists!`)
       }
@@ -36,7 +38,9 @@ export class TournamService {
   }
 
   async findTournamById(id: string): Promise<Tournam> {
-    const existingTournam = await this.tournamRepository.findOne({ where: { tournamId: id.toString() } });
+    const existingTournam = await this.tournamRepository.findOne({
+      where: { tournamId: id.toString() }
+    });
     if (!existingTournam) {
       throw new NotFoundException(`The Tournam:${id} not found`);
     }

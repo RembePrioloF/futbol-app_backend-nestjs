@@ -1,7 +1,8 @@
 import { Team } from "src/teams/entities/team.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Positions } from "../dto";
 import { Match } from "src/matches/entities/match.entity";
+import { PlayerInMatch } from "src/player_in_match/entities/player_in_match.entity";
 
 @Entity('players')
 export class Player {
@@ -38,7 +39,9 @@ export class Player {
     team: Team;
 
     @ManyToMany(() => Match, (match) => match.players)
-    @JoinTable()
     matchs: Match[];
 
+    @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.player)
+    playerInMatches: PlayerInMatch[];
+  
 }

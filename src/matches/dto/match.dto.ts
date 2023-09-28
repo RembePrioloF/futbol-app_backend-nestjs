@@ -5,7 +5,7 @@ import { Tournam } from 'src/tournaments/entities/tournam.entity';
 export class MatchDto {
 
     @IsString()
-    dateTime: Date;
+    dateMatch: Date;
 
     @IsString()
     field: string;
@@ -14,9 +14,9 @@ export class MatchDto {
     tournam: Tournam;
 
     @IsString()
-    localTeamId: Team;
+    localTeam: Team;
 
     @IsString()
-    visitingTeamId: Team; 
+    visitingTeam: Team; 
 
 } 

@@ -5,6 +5,7 @@ import { DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT, DB_USER } from '../config/c
 import { AuthModule } from './auth/auth.module';
 import { MatchModule } from './matches/match.module';
 import { ParticipationModule } from './participation/participation.module';
+import { PlayerInMatchModule } from './player_in_match/player_in_match.module';
 import { PlayerModule } from './players/player.module';
 import { TeamModule } from './teams/team.module';
 import { TournamModule } from './tournaments/tournam.module';
@@ -34,6 +35,7 @@ import { TournamModule } from './tournaments/tournam.module';
     PlayerModule,
     ParticipationModule,
     MatchModule,
+    PlayerInMatchModule,
   ],
   controllers: [],
   providers: [],

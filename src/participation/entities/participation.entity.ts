@@ -6,7 +6,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToO
 @Unique(['team', 'tournam'])
 export class Participation {
 
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string; // Esta será la clave primaria artificial
 
   @PrimaryColumn()

@@ -34,10 +34,10 @@ export class Team {
   players: Player[];
 
   @OneToMany(() => Match, (match) => match.localTeam)
-  localTeam: Match[];
+  localMatches: Match[];
 
   @OneToMany(() => Match, (match) => match.visitingTeam)
-  visitingTeam: Match[];
+  visitingMatches: Match[];
 
   @OneToMany(() => Participation, (participation) => participation.team)
   participations: Participation[];

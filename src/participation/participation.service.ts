@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { ParticipationDto } from './dto';
 import { Participation } from './entities/participation.entity';
@@ -15,7 +16,10 @@ export class ParticipationService {
   async createParticipation(participations: Partial<Participation>): Promise<Participation> {
     try {
       // Crea un nuevo Participation
-      const newParticipation = this.participationRepository.create(participations);
+      const newParticipation = this.participationRepository.create({
+        ...participations,
+        id: short(),
+      });
       return await this.participationRepository.save(newParticipation);
     } catch (error) {
       console.log(error);
@@ -42,7 +46,7 @@ export class ParticipationService {
 
   async findParticipationById(id: string): Promise<Participation> {
     const existingParticipation = await this.participationRepository.findOne({
-      where: { id: id.toString() },
+      where: { id },
       relations: ['team', 'tournam'],
     });
     if (!existingParticipation) {

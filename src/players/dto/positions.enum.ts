@@ -1,7 +1,7 @@
 
 export enum Positions {
     Portero = 'portero',
-    DefensaCentral = 'defensa central',
+    /* DefensaCentral = 'defensa central',
     DefensaLateral = 'defensa lateral',
     DefensaLibre = 'defensa libre',
     DefensaCarrilero = 'defensa carrilero',
@@ -11,5 +11,5 @@ export enum Positions {
     CentrocampistaInterior = 'centrocampista interior',
     DelanteroSegundo = 'delantero segundo',
     Delanterocentro = 'delantero centro',
-    Delanteroextremo = 'delantero extremo',
+    Delanteroextremo = 'delantero extremo', */
 } 

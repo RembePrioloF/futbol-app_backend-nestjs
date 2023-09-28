@@ -1,15 +1,14 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
-import { Match } from './entities/match.entity';
-import { MatchService } from './match.service';
 import { MatchDto } from './dto';
+import { MatchService } from './match.service';
 
 @Controller('match')
 export class MatchController {
   constructor(private readonly matchService: MatchService) { }
 
   @Post()
-  createMatch(@Param('id') id: string, @Body() matchDto: Partial<Match>[]) {
-    return this.matchService.createMatch(id, matchDto);
+  createMatch(@Body() matchDto: MatchDto) {
+    return this.matchService.createMatch(matchDto);
   }
 
   @Get()
