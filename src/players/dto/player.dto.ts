@@ -1,6 +1,5 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { Team } from 'src/teams/entities/team.entity';
-import { Positions } from './positions.enum';
 
 export class PlayerDto {
 
@@ -15,7 +14,7 @@ export class PlayerDto {
 
     @IsString()
     @IsOptional()
-    position: Positions;
+    position: string;
 
     @IsString()
     team: Team;

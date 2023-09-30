@@ -1,13 +1,7 @@
 import { Match } from 'src/matches/entities/match.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
-
-enum MatchEvent {
-  GolMarcado = 'gol marcado',
-  TarjetaAmarilla = 'tarjeta amarilla',
-  TarjetaRoja = 'tarjeta roja',
-  TarjetaAzul = 'tarjeta azul',
-}
+import { MatchEvent } from '../dto';
 
 @Entity('players_in_matches')
 @Unique(['player', 'dateTime']) // Añadir un índice único para evitar duplicados
@@ -16,11 +10,11 @@ export class PlayerInMatch {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum', enum: MatchEvent })
-  matchEvent: string;
-
   @Column({ type: 'datetime' })
   dateTime: Date;
+
+  @Column({ type: 'enum', enum: MatchEvent })
+  matchEvent: string;
 
   @Column()
   punto: number;

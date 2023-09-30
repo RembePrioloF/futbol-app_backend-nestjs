@@ -24,7 +24,7 @@ export class TeamService {
     } catch (error) {
       console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The team #${teamDto.name} already exists!`)
+        throw new BadRequestException(`The team: ${teamDto.name} already exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }

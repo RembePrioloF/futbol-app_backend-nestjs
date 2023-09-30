@@ -5,10 +5,10 @@ import { Player } from 'src/players/entities/player.entity';
 export class PlayerInMatchDto {
 
     @IsString()
-    matchEvent: string;
+    dateTime: Date;
 
     @IsString()
-    dateTime: Date;
+    matchEvent: string;
 
     @IsNumber()
     punto: number;

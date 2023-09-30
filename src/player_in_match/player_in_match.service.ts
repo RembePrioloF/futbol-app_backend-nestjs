@@ -49,7 +49,7 @@ export class PlayerInMatchService {
   async findPlayerInMatchById(id: string): Promise<PlayerInMatch> {
     const existingMatch = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() },
-      relations: ['localTeam', 'visitingTeam', 'tournam'],
+      relations: ['player', 'match', 'matchEvent'],
     });
     if (!existingMatch) {
       throw new NotFoundException(`The Match:${id} not found`);

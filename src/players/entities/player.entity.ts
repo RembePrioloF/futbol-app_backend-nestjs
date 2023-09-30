@@ -1,8 +1,8 @@
 import { Team } from "src/teams/entities/team.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Positions } from "../dto";
 import { Match } from "src/matches/entities/match.entity";
 import { PlayerInMatch } from "src/player_in_match/entities/player_in_match.entity";
+import { Positions } from "../dto";
 
 @Entity('players')
 export class Player {
@@ -20,7 +20,7 @@ export class Player {
     playerNumber: number;
 
     @Column({ type: 'enum', enum: Positions })
-    position: Positions;
+    position: string;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;

@@ -2,7 +2,7 @@ import { PlayerInMatch } from 'src/player_in_match/entities/player_in_match.enti
 import { Player } from 'src/players/entities/player.entity';
 import { Team } from 'src/teams/entities/team.entity';
 import { Tournam } from 'src/tournaments/entities/tournam.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 @Entity('matches')
 @Unique(['localTeam', 'dateMatch']) // Añadir un índice único para evitar duplicados
@@ -14,7 +14,7 @@ export class Match {
 
   @Column({ type: 'date' })
   dateMatch: Date;
- 
+
   @Column()
   field: string;
 

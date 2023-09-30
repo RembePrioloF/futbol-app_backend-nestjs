@@ -20,14 +20,16 @@ import { PlayerInMatchService } from './player_in_match.service';
     MatchService,
     TournamService,
     TeamService,
-    PlayerService,],
+    PlayerService,
+  ],
   imports: [
     TypeOrmModule.forFeature([
       PlayerInMatch,
       Match,
       Tournam,
       Team,
-      Player]),
+      Player,
+    ]),
   ]
 })
 export class PlayerInMatchModule { }
