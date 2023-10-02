@@ -13,9 +13,6 @@ export class UpdateUser {
     @Column()
     password: string;
 
-    @Column({ default: true })
-    isActive: boolean;
-
     @Column({ type: 'enum', enum: UserRole, default: UserRole.MODERATOR })
     role: UserRole; 
 

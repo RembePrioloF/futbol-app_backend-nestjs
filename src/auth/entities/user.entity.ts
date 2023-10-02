@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserRole } from "../dto/roles.enum";
 
 @Entity('users')
@@ -16,16 +16,16 @@ export class User {
     @Column({ nullable: false, })
     password: string;
 
-    @Column({ default: true })
-    isActive: boolean;
-
     @Column({ type: 'enum', enum: UserRole })
-    role: UserRole; 
+    role: UserRole;
 
-    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
+
+    @DeleteDateColumn({ type: 'timestamp', nullable: true })
+    deleteAt: Date;
 
 }

@@ -8,10 +8,6 @@ export class UpdateUserDto {
     @MinLength(6)
     password: string;
 
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
-
     @IsString()
     @IsOptional()
     role: string;

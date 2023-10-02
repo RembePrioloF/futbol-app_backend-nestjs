@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Request, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, UpdateUserDto, UserDto } from './dto';
 
@@ -34,8 +34,20 @@ export class AuthController {
   }
 
   @Delete(':id')
-  async disableUser(@Param('id') id: number) {
-    return this.authService.disableUser(id);
+  async deleteUser(@Param('id') id: string) {
+    return this.authService.deleteUser(id);
+  }
+
+  @Patch('/restore/:id')
+  async restoreUser(@Res() response, @Param('id') id: string) {
+    try {
+      const userData = await this.authService.restoreUser(id);
+      return response.status(HttpStatus.OK).json({
+        message: 'User successfully restored', userData,
+      });
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
   }
 
   /* 

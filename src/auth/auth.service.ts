@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedE
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcryptjs from 'bcryptjs';
+import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { LoginDto, UpdateUserDto, UserDto } from './dto';
 import { User } from './entities/user.entity';
@@ -22,22 +23,18 @@ export class AuthService {
     private jwtService: JwtService,
   ) { }
 
-  async create(userDto: UserDto): Promise<User> {
-    // Guarda el nuevo usuario en la base de datos
-    return await this.userRepository.save(userDto);
-  }
-
   async registerUser(registerUser: UserDto): Promise<User> {
     try {
       // Crea un nuevo usuario
-      const createdUser = await this.create({
-        ...registerUser,
+      const createdUser = await this.userRepository.create({
+        ...registerUser, id: short(),
         // Hashea la contraseña antes de crear el usuario
         password: await this.hashPassword(registerUser.password),
       });
+      await this.userRepository.save(createdUser);
       // Elimina la contraseña antes de devolver los datos del usuario
       createdUser.password = undefined;
-      return createdUser;
+      return createdUser
     } catch (error) {
       console.log(error);
       if (error?.code === 'ER_DUP_ENTRY') {
@@ -129,18 +126,31 @@ export class AuthService {
     }
   }
 
-  async disableUser(id: number) {
+  async deleteUser(id: string) {
     const user = await this.userRepository.findOne({ where: { id: id.toString() } });
-    if (!user)
-      throw new NotFoundException(`User #${id} not found`);
+    if (!user) {
+      throw new NotFoundException(`The User:${id} not found`);
+    }
+    await this.userRepository.softRemove(user); // Realiza la eliminación lógica
+    return { message: `The User:${id} disabled` };
+  }
 
-    if (user.isActive === false)
-      throw new NotFoundException(`User #${user.name} is already disabled`);
-
-    user.isActive = false; // Cambia el estado isActive a false
-    await this.userRepository.save(user); // Guarda la actualización en la base de datos
-
-    return { message: `User #${user.name} disabled` };
+  async restoreUser(id: string): Promise<User | undefined> {
+    // Busca el User eliminado lógicamente por su ID
+    const user = await this.userRepository.findOne({
+      where: { id: id.toString() },
+      withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found.`);
+    }
+    if (user.deleteAt == null) {
+      throw new NotFoundException(`User with ID ${id} already restored.`);
+    }
+    // Restaura el User estableciendo deleteAt a null
+    user.deleteAt = null;
+    // Guarda los cambios en la base de datos
+    return this.userRepository.save(user);
   }
 
   getJwtToken(payload: JwtPayload) {
