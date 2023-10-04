@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { TeamService } from 'src/teams/team.service';
+import { TournamService } from 'src/tournaments/tournam.service';
 import { Repository } from 'typeorm';
 import { ParticipationDto } from './dto';
 import { Participation } from './entities/participation.entity';
@@ -11,28 +13,30 @@ export class ParticipationService {
   constructor(
     @InjectRepository(Participation)
     private readonly participationRepository: Repository<Participation>,
+    private readonly tournamService: TournamService,
+    private readonly teamService: TeamService,
   ) { }
 
-  async createParticipation(participations: Partial<Participation>): Promise<Participation> {
+  async createParticipation(participationDto: ParticipationDto): Promise<Participation> {
+    const { tournam, team } = participationDto;
+    // Verifica si el torneo existe
+    await this.tournamService.findTournamById(String(tournam));
+    // Verifica si el equipo existe
+    await this.teamService.findTeamById(String(team));
     try {
-      // Crea un nuevo Participation
       const newParticipation = this.participationRepository.create({
-        ...participations,
+        ...participationDto,
         id: short(),
       });
-      return await this.participationRepository.save(newParticipation);
+      // Guarda el nuevo Participation en la base de datos
+      const savedParticipation = await this.participationRepository.save(newParticipation);
+      return savedParticipation;
     } catch (error) {
-      console.log(error);
+      console.error(error);
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Participation already exists!`)
+        throw new BadRequestException(`Team:${team} already exists in this Tournament:${tournam}`)
       }
-      if (error.code === 'ER_NO_DEFAULT_FOR_FIELD') {
-        throw new BadRequestException(`The Participations1: not exists!`)
-      }
-      if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-        throw new BadRequestException(`The Participations2: not exists!`)
-      }
-      throw new InternalServerErrorException('Something terribe happen!!!');
+      throw new InternalServerErrorException('Something terrible happened while creating the participation.');
     }
   }
 

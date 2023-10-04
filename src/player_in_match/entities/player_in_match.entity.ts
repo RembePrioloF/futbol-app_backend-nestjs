@@ -16,7 +16,7 @@ export class PlayerInMatch {
   @Column({ type: 'enum', enum: MatchEvent })
   matchEvent: string;
 
-  @Column()
+  @Column({ default: 1 })
   punto: number;
 
   @CreateDateColumn({ type: "timestamp" })

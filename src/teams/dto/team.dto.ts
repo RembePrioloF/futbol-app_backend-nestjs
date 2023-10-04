@@ -1,9 +1,9 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { Tournam } from 'src/tournaments/entities/tournam.entity';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class TeamDto {
 
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsString()
@@ -11,10 +11,7 @@ export class TeamDto {
     logo: string;
 
     @IsString()
+    @IsNotEmpty()
     coach: string;
-
-    @IsBoolean()
-    @IsOptional()
-    isActive: boolean;
 
 }

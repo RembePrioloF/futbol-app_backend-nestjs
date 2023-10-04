@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 import { Match } from 'src/matches/entities/match.entity';
 import { Player } from 'src/players/entities/player.entity';
 
@@ -11,6 +11,7 @@ export class PlayerInMatchDto {
     matchEvent: string;
 
     @IsNumber()
+    @IsOptional()
     punto: number;
 
     @IsString()

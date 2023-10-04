@@ -16,8 +16,7 @@ export class TournamService {
   async createTournam(tournamDto: TournamDto): Promise<Tournam> {
     try {
       const newTournam = this.tournamRepository.create({
-        ...tournamDto,
-        tournamId: short(),
+        ...tournamDto, tournamId: short(),
       });
       return await this.tournamRepository.save(newTournam);
     } catch (error) {
@@ -39,7 +38,8 @@ export class TournamService {
 
   async findTournamById(id: string): Promise<Tournam> {
     const existingTournam = await this.tournamRepository.findOne({
-      where: { tournamId: id.toString() }
+      where: { tournamId: id.toString() },
+      relations: ['participations'],
     });
     if (!existingTournam) {
       throw new NotFoundException(`The Tournam:${id} not found`);

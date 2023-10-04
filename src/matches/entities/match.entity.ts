@@ -31,11 +31,11 @@ export class Match {
   @JoinColumn({ name: 'tournamId' })
   tournam: Tournam;
 
-  @ManyToOne(() => Team, (team) => team.localMatches)
+  @ManyToOne(() => Team, (team) => team.localTeam)
   @JoinColumn({ name: 'localTeamId', referencedColumnName: 'teamId' })
   localTeam: Team;
 
-  @ManyToOne(() => Team, (team) => team.visitingMatches)
+  @ManyToOne(() => Team, (team) => team.visitingTeam)
   @JoinColumn({ name: 'visitingTeamId', referencedColumnName: 'teamId' })
   visitingTeam: Team;
 

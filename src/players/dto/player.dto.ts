@@ -1,22 +1,38 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 import { Team } from 'src/teams/entities/team.entity';
 
 export class PlayerDto {
 
     @IsString()
+    @IsNotEmpty()
     name: string;
 
     @IsString()
+    @IsNotEmpty()
     birthDate: Date;
 
     @IsNumber()
+    @IsNotEmpty()
     playerNumber: number;
 
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
     position: string;
 
+    @IsBoolean()
+    @IsOptional()
+    isCaptain: boolean;
+
+    @IsEmail()
+    @IsOptional()
+    email: string;
+
+    @IsNumber()
+    @IsOptional()
+    phone: number;
+
     @IsString()
+    @IsNotEmpty()
     team: Team;
 
 }

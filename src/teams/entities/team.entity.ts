@@ -9,7 +9,7 @@ export class Team {
   @PrimaryGeneratedColumn('uuid')
   teamId: string;
 
-  @Column({ unique: true, nullable: true })
+  @Column({ unique: true })
   name: string;
 
   @Column({ nullable: true })
@@ -34,10 +34,10 @@ export class Team {
   players: Player[];
 
   @OneToMany(() => Match, (match) => match.localTeam)
-  localMatches: Match[];
+  localTeam: Match[];
 
   @OneToMany(() => Match, (match) => match.visitingTeam)
-  visitingMatches: Match[];
+  visitingTeam: Match[];
 
   @OneToMany(() => Participation, (participation) => participation.team)
   participations: Participation[];

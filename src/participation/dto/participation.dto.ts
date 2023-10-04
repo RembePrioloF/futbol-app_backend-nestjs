@@ -1,4 +1,5 @@
 import { IsString } from 'class-validator';
+import { Team } from 'src/teams/entities/team.entity';
 
 export class ParticipationDto {
 
@@ -9,9 +10,9 @@ export class ParticipationDto {
     referee: string;
 
     @IsString()
-    teamId: string;
+    team: Team;
 
     @IsString()
-    tournamId: string;
+    tournam: Team;
 
 }

@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { ParticipationDto } from './dto';
-import { Participation } from './entities/participation.entity';
 import { ParticipationService } from './participation.service';
 
 @Controller('participation')
@@ -8,7 +7,7 @@ export class ParticipationController {
   constructor(private readonly participationService: ParticipationService) { }
 
   @Post()
-  createParticipation(@Body() participationDto: Partial<Participation>) {
+  createParticipation(@Body() participationDto: ParticipationDto) {
     return this.participationService.createParticipation(participationDto);
   }
 

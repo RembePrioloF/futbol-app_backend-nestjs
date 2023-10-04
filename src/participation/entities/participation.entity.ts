@@ -9,12 +9,6 @@ export class Participation {
   @PrimaryGeneratedColumn('uuid')
   id: string; // Esta será la clave primaria artificial
 
-  @PrimaryColumn()
-  teamId: string;
-
-  @PrimaryColumn()
-  tournamId: string;
-
   @Column({ type: 'date' })
   registrationDate: Date;
 
@@ -31,11 +25,9 @@ export class Participation {
   deleteAt: Date;
 
   @ManyToOne(() => Team, (team) => team.participations)
-  @JoinColumn({ name: 'teamId' })
   team: Team;
 
   @ManyToOne(() => Tournam, (tournament) => tournament.participations)
-  @JoinColumn({ name: 'tournamId' })
   tournam: Tournam;
 
 } 

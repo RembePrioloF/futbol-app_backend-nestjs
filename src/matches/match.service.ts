@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { TeamService } from 'src/teams/team.service';
 import { Repository } from 'typeorm';
 import { TournamService } from '../tournaments/tournam.service';
 import { MatchDto } from './dto';
 import { Match } from './entities/Match.entity';
-import { TeamService } from 'src/teams/team.service';
 
 @Injectable()
 export class MatchService {

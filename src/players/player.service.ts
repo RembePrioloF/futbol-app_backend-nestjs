@@ -1,6 +1,7 @@
 import { BadRequestException, HttpException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { TeamService } from 'src/teams/team.service';
 import { Repository } from 'typeorm';
 import { PlayerDto } from './dto';
 import { Player } from './entities/player.entity';
@@ -10,25 +11,45 @@ export class PlayerService {
 
   constructor(
     @InjectRepository(Player)
-    private readonly playerRepository: Repository<Player>
+    private readonly playerRepository: Repository<Player>,
+    private readonly teamService: TeamService,
   ) { }
 
   async createPlayer(playerDto: PlayerDto): Promise<Player> {
+    const { name, playerNumber, birthDate, email, phone, team } = playerDto;
+    // Verifica si el equipo existe en la base de datos
+    const existingTeam = await this.teamService.findTeamById(String(team));
+    // Si el equipo no se encuentra, lanza una excepción
+    if (!existingTeam) {
+      throw new NotFoundException(`Team with ID ${team} not found.`);
+    }
     try {
-      // Verificar si ya existe un jugador con el mismo nombre y playerNumber
+      const league = existingTeam.participations[0]?.tournam?.league;
       const existingPlayer = await this.playerRepository.findOne({
-        where: [
-          { name: playerDto.name },
-          { playerNumber: playerDto.playerNumber }
-        ]
+        where: [{ name }, { playerNumber }, { email }, { phone }],
       });
       if (existingPlayer) {
-        if (existingPlayer.name === playerDto.name) {
-          throw new BadRequestException(`A player with the Name:${playerDto.name} already exists.`);
+        if (existingPlayer.name === name) {
+          throw new BadRequestException(`A player with the Name:${name} already exists.`);
         }
-        if (existingPlayer.playerNumber === playerDto.playerNumber) {
-          throw new BadRequestException(`A player with the Number:${playerDto.playerNumber} already exists.`);
+        if (existingPlayer.playerNumber === playerNumber) {
+          throw new BadRequestException(`A player with the Number:${playerNumber} already exists.`);
         }
+        if (existingPlayer.email === email) {
+          throw new BadRequestException(`A player with the Email:${email} already exists.`);
+        }
+        if (existingPlayer.phone === phone) {
+          throw new BadRequestException(`A player with the Cellphone:${phone} already exists.`);
+        }
+      }
+      const birthDateObj = new Date(birthDate);
+      // Calcula la fecha actual
+      const presentDate = new Date();
+      // Calcula la edad del jugador restando el año de nacimiento del año actual
+      const age = presentDate.getFullYear() - birthDateObj.getFullYear();
+      // Verifica si el jugador tiene al menos 18 años
+      if (age < 18 && league === 'veteranos') {
+        throw new BadRequestException(`The player: ${name} is a minor and cannot join an adult league.`);
       }
       // Crea un nuevo jugador
       const newPlayer = this.playerRepository.create({
@@ -41,16 +62,7 @@ export class PlayerService {
       if (error instanceof BadRequestException) {
         // El jugador ya existe, relanzar la excepción
         throw error;
-      }
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The team:${playerDto.name} already exists!`)
-      }
-      if (error?.code === 'WARN_DATA_TRUNCATED') {
-        throw new HttpException(`The position:${playerDto.position} not exists!`, HttpStatus.BAD_REQUEST);
-      }
-      if (error?.code === 'ER_NO_REFERENCED_ROW_2') {
-        throw new HttpException(`This team doesn't exist!`, HttpStatus.BAD_REQUEST);
-      } else {
+      } {
         // Ocurrió un error interno
         throw new InternalServerErrorException('Something terrible happened while creating the player.');
       }
@@ -68,7 +80,7 @@ export class PlayerService {
   async findPlayerById(id: string): Promise<Player> {
     const existingPlayer = await this.playerRepository.findOne({
       where: { playerId: id.toString() },
-      relations: ['team'], // Esto carga automáticamente la relación con el equipo
+      relations: ['team.participations.tournam', 'playerInMatches'],
     });
     if (!existingPlayer) {
       throw new NotFoundException(`The Player:${id} not found`);

@@ -1,8 +1,9 @@
-import { Team } from "src/teams/entities/team.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Match } from "src/matches/entities/match.entity";
 import { PlayerInMatch } from "src/player_in_match/entities/player_in_match.entity";
+import { Team } from "src/teams/entities/team.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Positions } from "../dto";
+import { Tournam } from "src/tournaments/entities/tournam.entity";
 
 @Entity('players')
 export class Player {
@@ -21,6 +22,15 @@ export class Player {
 
     @Column({ type: 'enum', enum: Positions })
     position: string;
+
+    @Column({ default: false })
+    isCaptain: boolean;
+
+    @Column({ unique: true })
+    email: string;
+
+    @Column({ unique: true })
+    phone: number;
 
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
@@ -43,5 +53,5 @@ export class Player {
 
     @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.player)
     playerInMatches: PlayerInMatch[];
-  
+
 }

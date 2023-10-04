@@ -38,10 +38,10 @@ export class AuthService {
     } catch (error) {
       console.log(error);
       if (error?.code === 'ER_DUP_ENTRY') {
-        throw new HttpException(`The user with email ${registerUser.email} already exists!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`The user with email:${registerUser.email} already exists!`, HttpStatus.BAD_REQUEST);
       }
       if (error?.code === 'WARN_DATA_TRUNCATED') {
-        throw new HttpException(`The role #${registerUser.role} not exists!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`The role:${registerUser.role} not exists!`, HttpStatus.BAD_REQUEST);
       }
       throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
     }

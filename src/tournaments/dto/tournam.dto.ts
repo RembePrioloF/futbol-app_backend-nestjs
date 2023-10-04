@@ -1,4 +1,5 @@
-import { IsBoolean, IsDate, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { League } from './league.enum';
 
 export class TournamDto {
 
@@ -8,12 +9,13 @@ export class TournamDto {
     @IsString()
     location: string;
 
-    @IsString()
-    league: string;
+    @IsEnum(League)
+    @IsNotEmpty()
+    league: League;
 
     @IsString()
     startDate: Date;
-  
+
     @IsString()
     endDate: Date;
 

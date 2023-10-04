@@ -1,6 +1,8 @@
 import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { League } from "../dto/league.enum";
+import { Player } from "src/players/entities/player.entity";
 
 @Entity('tournaments')
 export class Tournam {
@@ -14,8 +16,8 @@ export class Tournam {
     @Column()
     location: string;
 
-    @Column()
-    league: string;
+    @Column({ type: 'enum', enum: League })
+    league: League;
 
     @Column('date')
     startDate: Date;
@@ -41,4 +43,7 @@ export class Tournam {
     @OneToMany(() => Participation, (participation) => participation.tournam)
     participations: Participation[];
 
+    @ManyToMany(() => Player, (player) => player.matchs)
+    players: Player[];
+  
 }
