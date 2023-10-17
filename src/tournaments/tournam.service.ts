@@ -25,15 +25,15 @@ export class TournamService {
         throw new BadRequestException(`The Tournam:${tournamDto.name} already exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
-    }
+    } 
   }
 
   async findAllTournam(): Promise<Tournam[]> {
-    const tournamData = await this.tournamRepository.find();
-    if (!tournamData || tournamData.length == 0) {
+    const tournaments = await this.tournamRepository.find();
+    if (!tournaments || tournaments.length == 0) {
       throw new NotFoundException('Tournaments data not found!');
     }
-    return tournamData;
+    return tournaments;
   }
 
   async findTournamById(id: string): Promise<Tournam> {

@@ -1,12 +1,18 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Request, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, UpdateUserDto, UserDto } from './dto';
+import { LoginDto, UpdateUserDto, UserDto, UserRole } from './dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
 
-  @Post('register')
+  // Ruta para obtener los valores del enum
+  @Get('/roles')
+  async getUserRoles() {
+    return await Object.values(UserRole);
+  }
+
+  @Post('/register')
   async registerUser(@Body() dto: UserDto) {
     const data = await this.authService.registerUser(dto);
     return { message: 'User registered', data };
@@ -18,7 +24,7 @@ export class AuthController {
   }
 
   @Get()
-  findAllUsers(@Request() req: Request) {
+  findAllUsers() {
     return this.authService.findAllUsers();
   }
 
@@ -28,12 +34,12 @@ export class AuthController {
     return existingTeam;
   }
 
-  @Put(':id')
+  @Put('/:id')
   async updateUser(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.authService.updateUser(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('/:id')
   async deleteUser(@Param('id') id: string) {
     return this.authService.deleteUser(id);
   }

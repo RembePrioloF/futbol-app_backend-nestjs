@@ -1,10 +1,17 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { TournamDto } from './dto';
+import { League } from './dto/league.enum';
 import { TournamService } from './tournam.service';
 
 @Controller('tournam')
 export class TournamController {
   constructor(private readonly tournamService: TournamService) { }
+
+  // Ruta para obtener los valores del enum
+  @Get('/league')
+  getLeague() {
+    return Object.values(League);
+  }
 
   @Post()
   createTournam(@Body() tournamDto: TournamDto) {
@@ -12,27 +19,13 @@ export class TournamController {
   }
 
   @Get()
-  async findAllTournam(@Res() response) {
-    try {
-      const tournamData = await this.tournamService.findAllTournam();
-      return response.status(HttpStatus.OK).json({
-        message: 'All Tournamenst data found successfully', tournamData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findAllTournam() {
+    return this.tournamService.findAllTournam();
   }
 
   @Get('/:id')
-  async findTournamById(@Res() response, @Param('id') id: string) {
-    try {
-      const existingTournam = await this.tournamService.findTournamById(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Tournam found successfully', existingTournam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findTournamById(@Param('id') id: string) {
+    return this.tournamService.findTournamById(id);
   }
 
   @Put('/:id')

@@ -4,9 +4,6 @@ import { Team } from 'src/teams/entities/team.entity';
 export class ParticipationDto {
 
     @IsString()
-    registrationDate: Date;
-
-    @IsString()
     referee: string;
 
     @IsString()

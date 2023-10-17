@@ -13,7 +13,7 @@ export class UpdateUser {
     @Column()
     password: string;
 
-    @Column({ type: 'enum', enum: UserRole, default: UserRole.MODERATOR })
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.User })
     role: UserRole; 
 
     @UpdateDateColumn({

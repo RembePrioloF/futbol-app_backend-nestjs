@@ -48,7 +48,7 @@ export class PlayerService {
       // Calcula la edad del jugador restando el año de nacimiento del año actual
       const age = presentDate.getFullYear() - birthDateObj.getFullYear();
       // Verifica si el jugador tiene al menos 18 años
-      if (age < 18 && league === 'veteranos') {
+      if (age < 18 && league === 'VETERANO') {
         throw new BadRequestException(`The player: ${name} is a minor and cannot join an adult league.`);
       }
       // Crea un nuevo jugador

@@ -9,9 +9,6 @@ export class Participation {
   @PrimaryGeneratedColumn('uuid')
   id: string; // Esta será la clave primaria artificial
 
-  @Column({ type: 'date' })
-  registrationDate: Date;
-
   @Column()
   referee: string;
 
