@@ -1,15 +1,17 @@
 import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Tournam } from "src/tournaments/entities/tournam.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @Entity('teams')
+@Unique('unique_team_name_in_tournament', ['name', 'tournam'])
 export class Team {
 
   @PrimaryGeneratedColumn('uuid')
   teamId: string;
 
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Column({ nullable: true })
@@ -21,14 +23,14 @@ export class Team {
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;
 
-  @UpdateDateColumn({
-    type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)",
-    onUpdate: "CURRENT_TIMESTAMP(6)"
-  })
+  @UpdateDateColumn({ type: "timestamp" })
   updatedAt: Date;
 
   @DeleteDateColumn({ type: "timestamp" })
   deleteAt: Date;
+
+  @ManyToOne(() => Tournam, (tournam) => tournam.teams)
+  tournam: Tournam;
 
   @OneToMany(() => Player, (player) => player.team)
   players: Player[];

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserRole } from "../dto/roles.enum";
+import { Tournam } from "src/tournaments/entities/tournam.entity";
 
 @Entity('users')
 export class User {
@@ -28,4 +29,6 @@ export class User {
     @DeleteDateColumn({ type: 'timestamp', nullable: true })
     deleteAt: Date;
 
+    @OneToMany(() => Tournam, (tournament) => tournament.user)
+    tournaments: Tournam[];
 }

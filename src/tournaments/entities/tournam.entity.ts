@@ -1,8 +1,10 @@
 import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { League } from "../dto/league.enum";
+import { User } from "src/auth/entities/user.entity";
+import { Team } from "src/teams/entities/team.entity";
 
 @Entity('tournaments')
 export class Tournam {
@@ -34,6 +36,9 @@ export class Tournam {
     @DeleteDateColumn({ type: 'timestamp' })
     deleteAt: Date;
 
+    @OneToMany(() => Team, (team) => team.tournam)
+    teams: Team[];
+  
     @OneToMany(() => Match, (match) => match.tournam)
     matchs: Match[];
 
@@ -43,4 +48,6 @@ export class Tournam {
     @ManyToMany(() => Player, (player) => player.matchs)
     players: Player[];
 
+    @ManyToOne(() => User, (user) => user.tournaments)
+    user: User;
 }

@@ -12,27 +12,13 @@ export class TeamController {
   }
 
   @Get()
-  async findAllTeam(@Res() response) {
-    try {
-      const TeamData = await this.teamService.findAllTeam();
-      return response.status(HttpStatus.OK).json({
-        message: 'All Teams data found successfully', TeamData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findAllTeam() {
+    return this.teamService.findAllTeam();
   }
 
   @Get('/:id')
-  async findTeamById(@Res() response, @Param('id') id: string) {
-    try {
-      const existingTeam = await this.teamService.findTeamById(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Team found successfully', existingTeam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findTeamById(@Param('id') id: string) {
+    return this.teamService.findTeamById(id);
   }
 
   @Put('/:id')

@@ -4,6 +4,7 @@ import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { TeamDto } from './dto';
 import { Team } from './entities/team.entity';
+import { TournamService } from 'src/tournaments/tournam.service';
 
 @Injectable()
 export class TeamService {
@@ -11,9 +12,14 @@ export class TeamService {
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    private readonly tournamService: TournamService,
   ) { }
 
   async createTeam(teamDto: TeamDto): Promise<Team> {
+    const existingTournam = await this.tournamService.findTournamById(String(teamDto.tournam));
+    if (!existingTournam) {
+      throw new NotFoundException(`Team with ID ${teamDto.tournam} not found.`);
+    }
     try {
       // Crea un nuevo equipo
       const newTeam = this.teamRepository.create({
@@ -41,7 +47,7 @@ export class TeamService {
   async findTeamById(id: string): Promise<Team> {
     const existingTeam = await this.teamRepository.findOne({
       where: { teamId: id.toString() },
-      relations: ['participations.tournam'],
+      relations: ['tournam'],
     });
     if (!existingTeam)
       throw new NotFoundException(`The Team: ${id} not found`);

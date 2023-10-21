@@ -25,7 +25,7 @@ export class TournamService {
         throw new BadRequestException(`The Tournam:${tournamDto.name} already exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
-    } 
+    }
   }
 
   async findAllTournam(): Promise<Tournam[]> {
@@ -39,7 +39,7 @@ export class TournamService {
   async findTournamById(id: string): Promise<Tournam> {
     const existingTournam = await this.tournamRepository.findOne({
       where: { tournamId: id.toString() },
-      relations: ['participations'],
+      relations: ['participations', 'teams'],
     });
     if (!existingTournam) {
       throw new NotFoundException(`The Tournam:${id} not found`);

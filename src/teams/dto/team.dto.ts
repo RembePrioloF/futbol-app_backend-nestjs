@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Tournam } from 'src/tournaments/entities/tournam.entity';
 
 export class TeamDto {
 
@@ -11,7 +12,11 @@ export class TeamDto {
     logo: string;
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     coach: string;
+
+    @IsString()
+    @IsNotEmpty()
+    tournam: Tournam;
 
 }

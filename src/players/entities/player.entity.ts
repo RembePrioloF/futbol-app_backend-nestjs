@@ -35,10 +35,7 @@ export class Player {
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
-    @UpdateDateColumn({
-        type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)",
-        onUpdate: "CURRENT_TIMESTAMP(6)"
-    })
+    @UpdateDateColumn({ type: "timestamp" })
     updatedAt: Date;
 
     @DeleteDateColumn({ type: "timestamp" })
