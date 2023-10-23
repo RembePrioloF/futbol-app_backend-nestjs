@@ -41,3 +41,32 @@ export class AuthGuard implements CanActivate {
 
 }
  */
+
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { User } from '../entities/user.entity';
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) { }
+
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user; // Obtén el usuario de la solicitud (puedes ajustar esto según tu implementación)
+
+    // Verifica si el usuario es el creador del torneo
+    const tournamentId = request.params.id; // Ajusta cómo obtienes el ID del torneo
+    if (this.isTournamentOwner(user, tournamentId)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private isTournamentOwner(user: User, tournamentId: string): boolean {
+    // Implementa tu lógica para verificar si el usuario es el creador del torneo.
+    // Puedes consultar la base de datos y comparar el ID del usuario con el creador del torneo.
+    // Si el usuario es el creador, devuelve true; de lo contrario, devuelve false.
+    return user.tournaments.some(tournament => tournament.tournamId === tournamentId);
+  }
+}

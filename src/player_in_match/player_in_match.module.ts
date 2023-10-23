@@ -1,6 +1,8 @@
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/auth/entities/user.entity';
 import { Match } from 'src/matches/entities/match.entity';
 import { MatchService } from 'src/matches/match.service';
 import { Player } from 'src/players/entities/player.entity';
@@ -21,6 +23,7 @@ import { PlayerInMatchService } from './player_in_match.service';
     TournamService,
     TeamService,
     PlayerService,
+    AuthService,
   ],
   imports: [
     TypeOrmModule.forFeature([
@@ -29,6 +32,7 @@ import { PlayerInMatchService } from './player_in_match.service';
       Tournam,
       Team,
       Player,
+      User,
     ]),
   ]
 })

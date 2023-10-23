@@ -1,6 +1,8 @@
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/auth/entities/user.entity';
 import { Team } from 'src/teams/entities/team.entity';
 import { TeamService } from 'src/teams/team.service';
 import { Tournam } from 'src/tournaments/entities/tournam.entity';
@@ -11,9 +13,14 @@ import { MatchService } from './match.service';
 
 @Module({
   controllers: [MatchController],
-  providers: [MatchService, TournamService, TeamService],
+  providers: [
+    MatchService,
+    TournamService,
+    TeamService,
+    AuthService
+  ],
   imports: [
-    TypeOrmModule.forFeature([Match, Tournam, Team]),
+    TypeOrmModule.forFeature([Match, Tournam, Team, User]),
   ]
 })
 export class MatchModule { }

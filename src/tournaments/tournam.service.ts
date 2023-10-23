@@ -4,6 +4,7 @@ import { generate as short } from 'short-uuid';
 import { Repository } from 'typeorm';
 import { TournamDto } from './dto';
 import { Tournam } from './entities/tournam.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TournamService {
@@ -11,9 +12,14 @@ export class TournamService {
   constructor(
     @InjectRepository(Tournam)
     private readonly tournamRepository: Repository<Tournam>,
+    private readonly authService: AuthService,
   ) { }
 
   async createTournam(tournamDto: TournamDto): Promise<Tournam> {
+    const existingUser = await this.authService.findUserById(String(tournamDto.user));
+    if (!existingUser) {
+      throw new NotFoundException(`User with ID ${tournamDto.user} not found.`);
+    }
     try {
       const newTournam = this.tournamRepository.create({
         ...tournamDto, tournamId: short(),

@@ -88,7 +88,10 @@ export class AuthService {
   }
 
   async findUserById(id: string): Promise<Partial<User> | undefined> {
-    const user = await this.userRepository.findOne({ where: { id: id.toString() } });
+    const user = await this.userRepository.findOne({ 
+      where: { id: id.toString() } ,
+      relations: ['tournaments'],
+    });
 
     const userWithoutPassword = { ...user };
     delete userWithoutPassword.password; // Elimina la propiedad 'password'

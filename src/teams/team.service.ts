@@ -18,7 +18,7 @@ export class TeamService {
   async createTeam(teamDto: TeamDto): Promise<Team> {
     const existingTournam = await this.tournamService.findTournamById(String(teamDto.tournam));
     if (!existingTournam) {
-      throw new NotFoundException(`Team with ID ${teamDto.tournam} not found.`);
+      throw new NotFoundException(`Tournam with ID ${teamDto.tournam} not found.`);
     }
     try {
       // Crea un nuevo equipo

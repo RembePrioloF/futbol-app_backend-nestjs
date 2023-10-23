@@ -1,4 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { User } from 'src/auth/entities/user.entity';
 import { League } from './league.enum';
 
 export class TournamDto {
@@ -22,5 +23,9 @@ export class TournamDto {
     @IsString()
     @IsOptional()
     endDate: Date;
+
+    @IsString()
+    @IsNotEmpty()
+    user: User;
 
 }

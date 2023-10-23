@@ -1,18 +1,19 @@
 import { Match } from "src/matches/entities/match.entity";
 import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { League } from "../dto/league.enum";
 import { User } from "src/auth/entities/user.entity";
 import { Team } from "src/teams/entities/team.entity";
 
 @Entity('tournaments')
+@Unique('unique_tournam_name_in_user', ['name', 'user'])
 export class Tournam {
 
     @PrimaryGeneratedColumn('uuid')
     tournamId: string;
 
-    @Column({ unique: true })
+    @Column()
     name: string;
 
     @Column()

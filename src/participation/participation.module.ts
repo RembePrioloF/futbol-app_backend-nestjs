@@ -8,12 +8,19 @@ import { TournamService } from 'src/tournaments/tournam.service';
 import { Participation } from './entities/participation.entity';
 import { ParticipationController } from './participation.controller';
 import { ParticipationService } from './participation.service';
+import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/auth/entities/user.entity';
 
 @Module({
   controllers: [ParticipationController],
-  providers: [ParticipationService, TournamService, TeamService],
+  providers: [
+    ParticipationService,
+    TournamService,
+    TeamService,
+    AuthService,
+  ],
   imports: [
-    TypeOrmModule.forFeature([Participation, Tournam, Team]),
+    TypeOrmModule.forFeature([Participation, Tournam, Team, User]),
   ]
 })
 export class ParticipationModule { }
