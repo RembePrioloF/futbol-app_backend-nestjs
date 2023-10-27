@@ -1,5 +1,5 @@
 
-export enum League {
+export enum Leagues {
     Infantil = 'INFANTIL',
     Juvenil = 'JUVENIL',
     Veteranos = 'VETERANO',

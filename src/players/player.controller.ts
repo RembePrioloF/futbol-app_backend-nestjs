@@ -1,39 +1,30 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
-import { PlayerDto } from './dto';
+import { PlayerDto, Positions } from './dto';
 import { PlayerService } from './player.service';
 
 @Controller('player')
 export class PlayerController {
   constructor(private readonly playerService: PlayerService) { }
 
+  // Ruta para obtener los valores del enum
+  @Get('/positions')
+  getLeague() {
+    return Object.values(Positions);
+  }
+
   @Post()
-  async createPlayer(@Body() PlayerDto: PlayerDto) {
-    const data = await this.playerService.createPlayer(PlayerDto);
-    return { message: 'User create', data };
+  createPlayer(@Body() PlayerDto: PlayerDto) {
+    return this.playerService.createPlayer(PlayerDto);
   }
 
   @Get()
-  async findAllPlayer(@Res() response) {
-    try {
-      const playerData = await this.playerService.findAllPlayer();
-      return response.status(HttpStatus.OK).json({
-        message: 'All Players data found successfully', playerData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findAllPlayer() {
+    return this.playerService.findAllPlayer();
   }
 
   @Get('/:id')
-  async findPlayerById(@Res() response, @Param('id') id: string) {
-    try {
-      const existingPlayer = await this.playerService.findPlayerById(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Player found successfully', existingPlayer,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findPlayerById(@Param('id') id: string) {
+    return this.playerService.findPlayerById(id);
   }
 
   @Put('/:id')

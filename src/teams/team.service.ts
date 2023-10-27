@@ -47,7 +47,7 @@ export class TeamService {
   async findTeamById(id: string): Promise<Team> {
     const existingTeam = await this.teamRepository.findOne({
       where: { teamId: id.toString() },
-      relations: ['tournam'],
+      relations: ['tournam','players'],
     });
     if (!existingTeam)
       throw new NotFoundException(`The Team: ${id} not found`);

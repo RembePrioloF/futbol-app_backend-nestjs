@@ -1,16 +1,21 @@
 import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { TournamDto } from './dto';
-import { League } from './dto/league.enum';
+import { Leagues } from './dto/leagues.enum';
 import { TournamService } from './tournam.service';
+import { Locations } from './dto/locations.enum';
 
 @Controller('tournam')
 export class TournamController {
   constructor(private readonly tournamService: TournamService) { }
 
   // Ruta para obtener los valores del enum
-  @Get('/league')
+  @Get('/leagues')
   getLeague() {
-    return Object.values(League);
+    return Object.values(Leagues);
+  }
+  @Get('/locations')
+  getLocation() {
+    return Object.values(Locations);
   }
 
   @Post()

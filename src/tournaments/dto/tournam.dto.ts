@@ -1,6 +1,7 @@
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { User } from 'src/auth/entities/user.entity';
-import { League } from './league.enum';
+import { Leagues } from './leagues.enum';
+import { Locations } from './locations.enum';
 
 export class TournamDto {
 
@@ -8,13 +9,13 @@ export class TournamDto {
     @IsNotEmpty()
     name: string;
 
-    @IsString()
+    @IsEnum(Locations)
     @IsNotEmpty()
-    location: string;
+    location: Locations;
 
-    @IsEnum(League)
+    @IsEnum(Leagues)
     @IsNotEmpty()
-    league: League;
+    league: Leagues;
 
     @IsString()
     @IsNotEmpty()

@@ -24,12 +24,8 @@ export class PlayerDto {
     isCaptain: boolean;
 
     @IsEmail()
-    @IsOptional()
+    @IsNotEmpty()
     email: string;
-
-    @IsNumber()
-    @IsOptional()
-    phone: number;
 
     @IsString()
     @IsNotEmpty()

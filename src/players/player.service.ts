@@ -16,7 +16,7 @@ export class PlayerService {
   ) { }
 
   async createPlayer(playerDto: PlayerDto): Promise<Player> {
-    const { name, playerNumber, birthDate, email, phone, team } = playerDto;
+    const { name, playerNumber, birthDate, email, team } = playerDto;
     // Verifica si el equipo existe en la base de datos
     const existingTeam = await this.teamService.findTeamById(String(team));
     // Si el equipo no se encuentra, lanza una excepción
@@ -24,22 +24,19 @@ export class PlayerService {
       throw new NotFoundException(`Team with ID ${team} not found.`);
     }
     try {
-      const league = existingTeam.participations[0]?.tournam?.league;
+      //const league = existingTeam.participations[0]?.tournam?.league;
       const existingPlayer = await this.playerRepository.findOne({
-        where: [{ name }, { playerNumber }, { email }, { phone }],
+        where: [{ playerNumber }, { email }],
       });
       if (existingPlayer) {
-        if (existingPlayer.name === name) {
+        /* if (existingPlayer.name === name) {
           throw new BadRequestException(`A player with the Name:${name} already exists.`);
         }
         if (existingPlayer.playerNumber === playerNumber) {
           throw new BadRequestException(`A player with the Number:${playerNumber} already exists.`);
-        }
+        } */
         if (existingPlayer.email === email) {
           throw new BadRequestException(`A player with the Email:${email} already exists.`);
-        }
-        if (existingPlayer.phone === phone) {
-          throw new BadRequestException(`A player with the Cellphone:${phone} already exists.`);
         }
       }
       const birthDateObj = new Date(birthDate);
@@ -48,9 +45,9 @@ export class PlayerService {
       // Calcula la edad del jugador restando el año de nacimiento del año actual
       const age = presentDate.getFullYear() - birthDateObj.getFullYear();
       // Verifica si el jugador tiene al menos 18 años
-      if (age < 18 && league === 'VETERANO') {
+      /* if (age < 18 && league === 'VETERANO') {
         throw new BadRequestException(`The player: ${name} is a minor and cannot join an adult league.`);
-      }
+      } */
       // Crea un nuevo jugador
       const newPlayer = this.playerRepository.create({
         ...playerDto,
@@ -62,7 +59,10 @@ export class PlayerService {
       if (error instanceof BadRequestException) {
         // El jugador ya existe, relanzar la excepción
         throw error;
-      } {
+      }
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException(`The Player Number: ${playerNumber} already exists!`)
+      } else {
         // Ocurrió un error interno
         throw new InternalServerErrorException('Something terrible happened while creating the player.');
       }
@@ -70,7 +70,9 @@ export class PlayerService {
   }
 
   async findAllPlayer(): Promise<Player[]> {
-    const playerData = await this.playerRepository.find();
+    const playerData = await this.playerRepository.find({
+      order: { createdAt: 'ASC' },
+    });
     if (!playerData || playerData.length == 0) {
       throw new NotFoundException('Players data not found!');
     }

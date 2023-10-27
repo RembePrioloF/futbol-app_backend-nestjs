@@ -1,23 +1,23 @@
 import { Match } from "src/matches/entities/match.entity";
 import { PlayerInMatch } from "src/player_in_match/entities/player_in_match.entity";
 import { Team } from "src/teams/entities/team.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Positions } from "../dto";
-import { Tournam } from "src/tournaments/entities/tournam.entity";
 
 @Entity('players')
+@Unique('unique_player_playerNumber_in_team', ['playerNumber', 'team'])
 export class Player {
 
     @PrimaryGeneratedColumn('uuid')
     playerId: string;
 
-    @Column({ unique: true })
+    @Column()
     name: string;
 
     @Column({ type: 'date' })
     birthDate: Date;
 
-    @Column({ unique: true })
+    @Column()
     playerNumber: number;
 
     @Column({ type: 'enum', enum: Positions })
@@ -29,9 +29,6 @@ export class Player {
     @Column({ unique: true })
     email: string;
 
-    @Column({ unique: true })
-    phone: number;
-
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
@@ -42,7 +39,6 @@ export class Player {
     deleteAt: Date;
 
     @ManyToOne(() => Team, (team) => team.players)
-    @JoinColumn({ name: 'teamId' })
     team: Team;
 
     @ManyToMany(() => Match, (match) => match.players)
