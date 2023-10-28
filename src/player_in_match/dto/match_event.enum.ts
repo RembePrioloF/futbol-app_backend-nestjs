@@ -1,7 +1,7 @@
 
 export enum MatchEvent {
-    GolMarcado = 'gol marcado',
-    TarjetaAmarilla = 'tarjeta amarilla',
-    TarjetaRoja = 'tarjeta roja',
-    TarjetaAzule = 'tarjeta azule',
+    GoalScored = 'gol marcado',
+    RedCard = 'tarjeta roja',
+    YellowCard = 'tarjeta amarilla',
+    BlueCard = 'tarjeta azul',
 } 

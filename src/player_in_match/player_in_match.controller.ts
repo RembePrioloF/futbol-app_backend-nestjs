@@ -13,27 +13,13 @@ export class PlayerInMatchController {
   }
 
   @Get()
-  async findAllPlayerInMatch(@Res() response) {
-    try {
-      const matchData = await this.playerInMatchService.findAllPlayerInMatch();
-      return response.status(HttpStatus.OK).json({
-        message: 'All Matchenst data found successfully', matchData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findAllPlayerInMatch() {
+    return this.playerInMatchService.findAllPlayerInMatch();
   }
 
   @Get('/:id')
-  async findPlayerInMatchById(@Res() response, @Param('id') id: string) {
-    try {
-      const existingMatch = await this.playerInMatchService.findPlayerInMatchById(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Match found successfully', existingMatch,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  findPlayerInMatchById(@Param('id') id: string) {
+    return this.playerInMatchService.findPlayerInMatchById(id);
   }
 
   @Put('/:id')

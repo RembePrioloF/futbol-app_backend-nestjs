@@ -39,7 +39,9 @@ export class PlayerInMatchService {
   }
 
   async findAllPlayerInMatch(): Promise<PlayerInMatch[]> {
-    const matchData = await this.playerInMatchRepository.find();
+    const matchData = await this.playerInMatchRepository.find({
+      relations: ['player.team'],
+    });
     if (!matchData || matchData.length == 0) {
       throw new NotFoundException('Matchents data not found!');
     }
@@ -49,7 +51,7 @@ export class PlayerInMatchService {
   async findPlayerInMatchById(id: string): Promise<PlayerInMatch> {
     const existingMatch = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() },
-      relations: ['player', 'match', 'matchEvent'],
+      relations: ['player.team'],
     });
     if (!existingMatch) {
       throw new NotFoundException(`The Match:${id} not found`);
