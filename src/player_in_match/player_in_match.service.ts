@@ -28,11 +28,8 @@ export class PlayerInMatchService {
       return await this.playerInMatchRepository.save(newMatch);
     } catch (error) {
       console.log(error);
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Player: ${matchDto.player} I already made an event at this moment!`)
-      }
       if (error?.code === 'WARN_DATA_TRUNCATED') {
-        throw new HttpException(`The Match Event #${matchDto.matchEvent} not exists!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`¡Este evento: ${matchDto.matchEvent} no existe!`, HttpStatus.BAD_REQUEST);
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
@@ -43,7 +40,7 @@ export class PlayerInMatchService {
       relations: ['player.team'],
     });
     if (!matchData || matchData.length == 0) {
-      throw new NotFoundException('Matchents data not found!');
+      throw new NotFoundException('Partidos no encontrados.');
     }
     return matchData;
   }
@@ -54,17 +51,19 @@ export class PlayerInMatchService {
       relations: ['player.team'],
     });
     if (!existingMatch) {
-      throw new NotFoundException(`The Match:${id} not found`);
+      throw new NotFoundException(`Evento: ${id} no encontrado`);
     }
     return existingMatch;
   }
 
   async updatePlayerInMatch(id: string, matchData: Partial<PlayerInMatch>): Promise<PlayerInMatch | undefined> {
+    await this.matchService.findMatchById(String(matchData.match));
+    await this.playerService.findPlayerById(String(matchData.player));
     const existingMatch = await this.playerInMatchRepository.findOne({
       where: { id: id.toString() }
     });
     if (!existingMatch) {
-      throw new NotFoundException(`Match with ID ${id} not found`);
+      throw new NotFoundException(`Evento: ${id} no encontrado`);
     }
     try {
       // Actualiza las propiedades del torneo con los datos proporcionados
@@ -74,14 +73,8 @@ export class PlayerInMatchService {
       return updateMatch;
     } catch (error) {
       console.log(error);
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Match already exists!`)
-      }
-      if (error.code === 'ER_NO_DEFAULT_FOR_FIELD') {
-        throw new BadRequestException(`The Match1: not exists!`)
-      }
-      if (error.code === 'ER_NO_REFERENCED_ROW_2') {
-        throw new BadRequestException(`The Tournam:${matchData} not exists!`)
+      if (error.code === 'WARN_DATA_TRUNCATED') {
+        throw new BadRequestException(`El Evento: ${matchData.matchEvent} not exists!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
@@ -90,10 +83,10 @@ export class PlayerInMatchService {
   async deletePlayerInMatch(id: string) {
     const match = await this.playerInMatchRepository.findOne({ where: { id: id.toString() } });
     if (!match) {
-      throw new NotFoundException(`The Match:${id} not found`);
+      throw new NotFoundException(`Evento: ${id} no encontrado`);
     }
     await this.playerInMatchRepository.softRemove(match); // Realiza la eliminación lógica
-    return { message: `The Match:${match} disabled` };
+    return { message: `Evento: ${match} deshabilitado` };
   }
 
   async restoreMatchent(id: string): Promise<PlayerInMatch | undefined> {
@@ -103,10 +96,10 @@ export class PlayerInMatchService {
       withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
     });
     if (!matchent) {
-      throw new NotFoundException(`Matchent with ID ${id} not found.`);
+      throw new NotFoundException(`Evento: ${id} no encontrado`);
     }
     if (matchent.deleteAt == null) {
-      throw new NotFoundException(`Matchent with ID ${id} already restored.`);
+      throw new NotFoundException(`Evento: ${id} ya está restaurado.`);
     }
     // Restaura el partido estableciendo deleteAt a null
     matchent.deleteAt = null;

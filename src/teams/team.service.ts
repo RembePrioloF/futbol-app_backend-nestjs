@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { TournamService } from 'src/tournaments/tournam.service';
 import { Repository } from 'typeorm';
 import { TeamDto } from './dto';
 import { Team } from './entities/team.entity';
-import { TournamService } from 'src/tournaments/tournam.service';
 
 @Injectable()
 export class TeamService {
@@ -16,10 +16,7 @@ export class TeamService {
   ) { }
 
   async createTeam(teamDto: TeamDto): Promise<Team> {
-    const existingTournam = await this.tournamService.findTournamById(String(teamDto.tournam));
-    if (!existingTournam) {
-      throw new NotFoundException(`Tournam with ID ${teamDto.tournam} not found.`);
-    }
+    await this.tournamService.findTournamById(String(teamDto.tournam));
     try {
       // Crea un nuevo equipo
       const newTeam = this.teamRepository.create({
@@ -30,7 +27,7 @@ export class TeamService {
     } catch (error) {
       console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The team: ${teamDto.name} already exists!`)
+        throw new BadRequestException(`El equipo: ${teamDto.name} ¡ya existe!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
@@ -39,7 +36,7 @@ export class TeamService {
   async findAllTeam(): Promise<Team[]> {
     const teamData = await this.teamRepository.find();
     if (!teamData || teamData.length == 0) {
-      throw new NotFoundException('Teams data not found!');
+      throw new NotFoundException('¡No se han encontrado datos de equipos!');
     }
     return teamData;
   }
@@ -47,17 +44,17 @@ export class TeamService {
   async findTeamById(id: string): Promise<Team> {
     const existingTeam = await this.teamRepository.findOne({
       where: { teamId: id.toString() },
-      relations: ['tournam','players'],
+      relations: ['tournam', 'players'],
     });
     if (!existingTeam)
-      throw new NotFoundException(`The Team: ${id} not found`);
+      throw new NotFoundException(`El Equipo: ${id} no encontrado`);
     return existingTeam;
   }
 
   async updateTeam(id: string, teamData: Partial<Team>): Promise<Team | undefined> {
     const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
     if (!existingTeam) {
-      throw new NotFoundException(`Team with ID ${id} not found`);
+      throw new NotFoundException(`El Equipo: ${id} no encontrado`);
     }
     // Actualiza las propiedades del equipo con los datos proporcionados
     Object.assign(existingTeam, teamData);
@@ -72,10 +69,10 @@ export class TeamService {
   async deleteTeam(id: string) {
     const team = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
     if (!team) {
-      throw new NotFoundException(`The Team:${id} not found`);
+      throw new NotFoundException(`El Equipo: ${id} no encontrado`);
     }
     await this.teamRepository.softRemove(team); // Realiza la eliminación lógica
-    return { message: `The Team:${team.name} disabled` };
+    return { message: `El equipo:${team.name} deshabilitado` };
   }
 
   async restoreTeam(id: string): Promise<Team | undefined> {
@@ -85,10 +82,10 @@ export class TeamService {
       withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
     });
     if (!team) {
-      throw new NotFoundException(`Team with ID ${id} not found.`);
+      throw new NotFoundException(`El Equipo: ${id} no encontrado`);
     }
     if (team.deleteAt == null) {
-      throw new NotFoundException(`Team with ID ${id} already restored.`);
+      throw new NotFoundException(`El equipo con ID: ${id} ya está restaurado.`);
     }
     // Restaura el Team estableciendo deleteAt a null
     team.deleteAt = null;

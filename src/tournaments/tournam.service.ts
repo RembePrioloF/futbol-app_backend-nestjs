@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
+import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
 import { TournamDto } from './dto';
 import { Tournam } from './entities/tournam.entity';
-import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class TournamService {
@@ -18,7 +18,7 @@ export class TournamService {
   async createTournam(tournamDto: TournamDto): Promise<Tournam> {
     const existingUser = await this.authService.findUserById(String(tournamDto.user));
     if (!existingUser) {
-      throw new NotFoundException(`User with ID ${tournamDto.user} not found.`);
+      throw new NotFoundException(`Usuario con ID: ${tournamDto.user} no encontrado.`);
     }
     try {
       const newTournam = this.tournamRepository.create({
@@ -28,7 +28,7 @@ export class TournamService {
     } catch (error) {
       console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Tournam:${tournamDto.name} already exists!`)
+        throw new BadRequestException(`El Torneo: ${tournamDto.name} ¡ya existe!`)
       }
       throw new InternalServerErrorException('Something terribe happen!!!');
     }
@@ -37,7 +37,7 @@ export class TournamService {
   async findAllTournam(): Promise<Tournam[]> {
     const tournaments = await this.tournamRepository.find();
     if (!tournaments || tournaments.length == 0) {
-      throw new NotFoundException('Tournaments data not found!');
+      throw new NotFoundException('¡No se han encontrado datos de torneos!');
     }
     return tournaments;
   }
@@ -48,7 +48,7 @@ export class TournamService {
       relations: ['participations', 'teams'],
     });
     if (!existingTournam) {
-      throw new NotFoundException(`The Tournam:${id} not found`);
+      throw new NotFoundException(`El Torneo: ${id} no encontrado.`);
     }
     return existingTournam;
   }
@@ -56,7 +56,7 @@ export class TournamService {
   async updateTournam(id: string, tournamData: Partial<Tournam>): Promise<Tournam | undefined> {
     const existingTournam = await this.tournamRepository.findOne({ where: { tournamId: id.toString() } });
     if (!existingTournam) {
-      throw new NotFoundException(`Tournam with ID ${id} not found`);
+      throw new NotFoundException(`El Torneo: ${id} no encontrado.`);
     }
     // Actualiza las propiedades del torneo con los datos proporcionados
     Object.assign(existingTournam, tournamData);
@@ -71,10 +71,10 @@ export class TournamService {
   async deleteTournam(id: string) {
     const tournam = await this.tournamRepository.findOne({ where: { tournamId: id.toString() } });
     if (!tournam) {
-      throw new NotFoundException(`The Tournam:${id} not found`);
+      throw new NotFoundException(`El Torneo: ${id} no encontrado.`);
     }
     await this.tournamRepository.softRemove(tournam); // Realiza la eliminación lógica
-    return { message: `The Tournam:${tournam.name} disabled` };
+    return { message: `El Torneo: ${tournam.name} deshabilitado.` };
   }
 
   async restoreTournament(id: string): Promise<Tournam | undefined> {
@@ -84,10 +84,10 @@ export class TournamService {
       withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
     });
     if (!tournament) {
-      throw new NotFoundException(`Tournament with ID ${id} not found.`);
+      throw new NotFoundException(`El Torneo: ${id} no encontrado.`);
     }
     if (tournament.deleteAt == null) {
-      throw new NotFoundException(`Tournament with ID ${id} already restored.`);
+      throw new NotFoundException(`El Torneo con ID: ${id} ya está restaurado.`);
     }
     // Restaura el torneo estableciendo deleteAt a null
     tournament.deleteAt = null;

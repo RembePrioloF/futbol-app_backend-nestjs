@@ -19,12 +19,12 @@ export class MatchService {
 
   async createMatch(matchDto: MatchDto): Promise<Match> {
     const { dateMatch, localTeam, visitingTeam, tournam } = matchDto;
-    // Verifica si el torneo existe antes de crear el partido
+
     await this.tournamService.findTournamById(String(tournam));
     await this.teamService.findTeamById(String(localTeam));
     await this.teamService.findTeamById(String(visitingTeam));
     if (matchDto.localTeam === matchDto.visitingTeam) {
-      throw new BadRequestException('The team are duplicated');
+      throw new BadRequestException('Los equipos están duplicados.');
     }
     try {
       // Crea un nuevo partido
@@ -55,7 +55,7 @@ export class MatchService {
       relations: ['localTeam', 'visitingTeam', 'tournam'],
     });
     if (!existingMatch) {
-      throw new NotFoundException(`The Match:${id} not found`);
+      throw new NotFoundException(`Partido no encontrado`);
     }
     return existingMatch;
   }

@@ -19,24 +19,17 @@ export class PlayerService {
     const { name, playerNumber, birthDate, email, team } = playerDto;
     // Verifica si el equipo existe en la base de datos
     const existingTeam = await this.teamService.findTeamById(String(team));
-    // Si el equipo no se encuentra, lanza una excepción
-    if (!existingTeam) {
-      throw new NotFoundException(`Team with ID ${team} not found.`);
-    }
     try {
-      //const league = existingTeam.participations[0]?.tournam?.league;
+      const league = existingTeam.tournam?.league;
       const existingPlayer = await this.playerRepository.findOne({
         where: [{ playerNumber }, { email }],
       });
       if (existingPlayer) {
-        /* if (existingPlayer.name === name) {
-          throw new BadRequestException(`A player with the Name:${name} already exists.`);
+        if (existingPlayer.email === email) {
+          throw new BadRequestException(`Ya existe un jugador con el correo electrónico: ${email}.`);
         }
         if (existingPlayer.playerNumber === playerNumber) {
-          throw new BadRequestException(`A player with the Number:${playerNumber} already exists.`);
-        } */
-        if (existingPlayer.email === email) {
-          throw new BadRequestException(`A player with the Email:${email} already exists.`);
+          throw new BadRequestException(`El Número del Jugador: ${playerNumber} ¡ya existe!`)
         }
       }
       const birthDateObj = new Date(birthDate);
@@ -45,9 +38,9 @@ export class PlayerService {
       // Calcula la edad del jugador restando el año de nacimiento del año actual
       const age = presentDate.getFullYear() - birthDateObj.getFullYear();
       // Verifica si el jugador tiene al menos 18 años
-      /* if (age < 18 && league === 'VETERANO') {
-        throw new BadRequestException(`The player: ${name} is a minor and cannot join an adult league.`);
-      } */
+      if (age < 18 && league === 'VETERANO') {
+        throw new BadRequestException(`el jugador: ${name}. es menor de edad y no puede unirse a una liga de adultos.`);
+      }
       // Crea un nuevo jugador
       const newPlayer = this.playerRepository.create({
         ...playerDto,
@@ -59,9 +52,6 @@ export class PlayerService {
       if (error instanceof BadRequestException) {
         // El jugador ya existe, relanzar la excepción
         throw error;
-      }
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException(`The Player Number: ${playerNumber} already exists!`)
       } else {
         // Ocurrió un error interno
         throw new InternalServerErrorException('Something terrible happened while creating the player.');
@@ -74,7 +64,7 @@ export class PlayerService {
       order: { createdAt: 'ASC' },
     });
     if (!playerData || playerData.length == 0) {
-      throw new NotFoundException('Players data not found!');
+      throw new NotFoundException('¡No se encontraron datos de jugadores!');
     }
     return playerData;
   }
@@ -85,19 +75,31 @@ export class PlayerService {
       relations: ['team.participations.tournam', 'playerInMatches'],
     });
     if (!existingPlayer) {
-      throw new NotFoundException(`The Player:${id} not found`);
+      throw new NotFoundException(`Jugador no encontrado`);
     }
     return existingPlayer;
   }
 
-  async updatePlayer(id: string, playerData: Partial<Player>): Promise<Player | undefined> {
-    const existingPlayer = await this.playerRepository.findOne({ where: { playerId: id.toString() } });
+  async updatePlayer(id: string, playerDto: Partial<Player>): Promise<Player | undefined> {
+    const { position, playerNumber, email, team } = playerDto;
+    await this.teamService.findTeamById(String(team));
+    const existingPlayer = await this.playerRepository.findOne({
+      where: [{ playerId: id.toString() }, { playerNumber }, { email }]
+    });
     if (!existingPlayer) {
-      throw new NotFoundException(`Player with ID ${id} not found`);
+      throw new NotFoundException(`El jugador: ${id} no encontrado`);
+    }
+    if (existingPlayer) {
+      if (existingPlayer.email === email) {
+        throw new BadRequestException(`Ya existe un jugador con el correo electrónico: ${email}.`);
+      }
+      if (existingPlayer.playerNumber === playerNumber) {
+        throw new BadRequestException(`El Número del Jugador: ${playerNumber} ¡ya existe!`)
+      }
     }
     try {
       // Actualiza las propiedades del jugador con los datos proporcionados
-      Object.assign(existingPlayer, playerData);
+      Object.assign(existingPlayer, playerDto);
       // Guarda los cambios en la base de datos
       const updatePlayer = await this.playerRepository.save(existingPlayer);
       // Devuelve el jugador actualizado sin la fecha de creación
@@ -107,7 +109,11 @@ export class PlayerService {
     } catch (error) {
       console.log(error);
       if (error?.code === 'WARN_DATA_TRUNCATED') {
-        throw new HttpException(`The position:${playerData.position} not exists!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`¡La posición: ${position} no existe!`, HttpStatus.BAD_REQUEST);
+      }
+      else {
+        // Ocurrió un error interno
+        throw new InternalServerErrorException('Something terrible happened while creating the player.');
       }
     }
   }
@@ -117,10 +123,10 @@ export class PlayerService {
       where: { playerId: id.toString() }
     });
     if (!player) {
-      throw new NotFoundException(`The Player:${id} not found`);
+      throw new NotFoundException(`El jugador: ${id} no encontrado`);
     }
     await this.playerRepository.softRemove(player); // Realiza la eliminación lógica
-    return { message: `The Player:${Player.name} disabled` };
+    return { message: `El jugador: ${Player.name} deshabilitado` };
   }
 
   async restorePlayer(id: string): Promise<Player | undefined> {
@@ -130,10 +136,10 @@ export class PlayerService {
       withDeleted: true, // Esto te permitirá acceder a los registros eliminados lógicamente
     });
     if (!player) {
-      throw new NotFoundException(`Player with ID ${id} not found.`);
+      throw new NotFoundException(`El jugador: ${id} no encontrado`);
     }
     if (player.deleteAt == null) {
-      throw new NotFoundException(`Player with ID ${id} already restored.`);
+      throw new NotFoundException(`El jugador: ${id} ya ha sido restaurado.`);
     }
     // Restaura el Player estableciendo deleteAt a null
     player.deleteAt = null;

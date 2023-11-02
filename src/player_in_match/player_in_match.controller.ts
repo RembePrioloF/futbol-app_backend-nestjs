@@ -1,11 +1,74 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
-import { PlayerInMatch } from './entities/player_in_match.entity';
-import { PlayerInMatchService } from './player_in_match.service';
+import { Body, Controller, Delete, Get, HttpStatus, OnModuleInit, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { PlayerService } from 'src/players/player.service';
+import { transporter } from '../../config/mailer';
 import { PlayerInMatchDto } from './dto';
+import { PlayerInMatchService } from './player_in_match.service';
 
 @Controller('player_in_match')
-export class PlayerInMatchController {
-  constructor(private readonly playerInMatchService: PlayerInMatchService) { }
+export class PlayerInMatchController implements OnModuleInit {
+
+  playerEmailsList: string[] = [];
+
+  constructor(
+    private readonly playerInMatchService: PlayerInMatchService,
+    private readonly playerService: PlayerService,
+  ) { }
+
+  async onModuleInit() {
+    try {
+      const players = await this.playerService.findAllPlayer();
+      this.playerEmailsList = players.map(player => player.email);
+    } catch (error) {
+      console.error('Error al cargar la lista de jugadores:', error);
+    }
+  }
+
+  @Post('/sendEmail')
+  async sendEmail(@Body() data: { htmlTemplate: string }, @Res() response) {
+    const playerEmails = this.playerEmailsList;
+    if (playerEmails.length === 0) {
+      return response.status(HttpStatus.BAD_REQUEST).json({
+        message: 'No se encontraron direcciones de correo electrónico'
+      });
+    }
+    const { htmlTemplate } = data;
+    try {
+      await new Promise((resolve, reject) => {
+        transporter.sendMail({
+          from: '"TournApp" <rembepriolo@gmail.com>',
+          to: 'rembepriolo@hotmail.com', //to: playerEmails.join(','), 
+          subject: 'Notificación Estadísticas del Jugador ✔',
+          text: 'Las Estadísticas del Jugador',
+          html: htmlTemplate
+        }, (error, info) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(info);
+          }
+        });
+      });
+      return response.status(HttpStatus.OK).json({
+        message: 'Los correos se han enviado exitosamente'
+      });
+    } catch (error) {
+      console.error(error);
+      if (error.code === 'EENVELOPE') {
+        return response.status(HttpStatus.REQUEST_TIMEOUT).json({
+          message: 'No hay destinatarios definidos'
+        });
+      }
+      if (error.code === 'ESOCKET') {
+        return response.status(HttpStatus.REQUEST_TIMEOUT).json({
+          message: 'Tiempo de espera agotado al conectar al servidor de correo'
+        });
+      } else {
+        return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          message: 'Error enviando los correos electrónicos'
+        });
+      }
+    }
+  }
 
   @Post()
   createPlayerInMatch(@Body() playerInMatchDto: PlayerInMatchDto) {
@@ -23,41 +86,18 @@ export class PlayerInMatchController {
   }
 
   @Put('/:id')
-  async updatePlayerInMatch(@Res() response, @Param('id') id: string, @Body() playerInMatchDto: PlayerInMatchDto) {
-    try {
-      const existingMatch = await this.playerInMatchService.updatePlayerInMatch(id, playerInMatchDto);
-      return response.status(HttpStatus.OK).json({
-        message: 'Match has been successfully updated',
-        existingMatch,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  updatePlayerInMatch(@Param('id') id: string, @Body() playerInMatchDto: PlayerInMatchDto) {
+    return this.playerInMatchService.updatePlayerInMatch(id, playerInMatchDto);
   }
 
   @Delete('/:id')
-  async deletePlayerInMatch(@Res() response, @Param('id') id: string) {
-    try {
-      const deletedMatch = await this.playerInMatchService.deletePlayerInMatch(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Match deleted successfully',
-        deletedMatch,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  deletePlayerInMatch(@Param('id') id: string) {
+    return this.playerInMatchService.deletePlayerInMatch(id);
   }
 
   @Patch('/restore/:id')
-  async restoreMatchent(@Res() response, @Param('id') id: string) {
-    try {
-      const MatchData = await this.playerInMatchService.restoreMatchent(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Matchent successfully restored', MatchData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  restoreMatchent(@Param('id') id: string) {
+    return this.playerInMatchService.restoreMatchent(id);
   }
 
 }

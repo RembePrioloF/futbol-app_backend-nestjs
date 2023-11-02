@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { TournamDto } from './dto';
 import { Leagues } from './dto/leagues.enum';
-import { TournamService } from './tournam.service';
 import { Locations } from './dto/locations.enum';
+import { TournamService } from './tournam.service';
 
 @Controller('tournam')
 export class TournamController {
@@ -34,41 +34,18 @@ export class TournamController {
   }
 
   @Put('/:id')
-  async updateTournam(@Res() response, @Param('id') id: string, @Body() tournamDto: TournamDto) {
-    try {
-      const existingTournam = await this.tournamService.updateTournam(id, tournamDto);
-      return response.status(HttpStatus.OK).json({
-        message: 'Tournam has been successfully updated',
-        existingTournam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  updateTournam(@Param('id') id: string, @Body() tournamDto: TournamDto) {
+    return this.tournamService.updateTournam(id, tournamDto);
   }
 
   @Delete('/:id')
-  async deleteTournam(@Res() response, @Param('id') id: string) {
-    try {
-      const deletedTournam = await this.tournamService.deleteTournam(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Tournam deleted successfully',
-        deletedTournam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  deleteTournam(@Param('id') id: string) {
+    return this.tournamService.deleteTournam(id);
   }
 
   @Patch('/restore/:id')
-  async restoreTournament(@Res() response, @Param('id') id: string) {
-    try {
-      const tournamData = await this.tournamService.restoreTournament(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Tournament successfully restored', tournamData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  restoreTournament(@Param('id') id: string) {
+    return this.tournamService.restoreTournament(id);
   }
 
 }

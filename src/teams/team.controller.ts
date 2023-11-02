@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { TeamDto } from './dto';
 import { TeamService } from './team.service';
 
@@ -22,41 +22,18 @@ export class TeamController {
   }
 
   @Put('/:id')
-  async updateTeam(@Res() response, @Param('id') id: string, @Body() teamDto: TeamDto) {
-    try {
-      const existingTeam = await this.teamService.updateTeam(id, teamDto);
-      return response.status(HttpStatus.OK).json({
-        message: 'Team has been successfully updated',
-        existingTeam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  updateTeam(@Param('id') id: string, @Body() teamDto: TeamDto) {
+    return this.teamService.updateTeam(id, teamDto);
   }
 
   @Delete('/:id')
-  async deleteTeam(@Res() response, @Param('id') id: string) {
-    try {
-      const deletedTeam = await this.teamService.deleteTeam(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Team deleted successfully',
-        deletedTeam,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  deleteTeam(@Param('id') id: string) {
+    return this.teamService.deleteTeam(id);
   }
 
   @Patch('/restore/:id')
-  async restoreTeam(@Res() response, @Param('id') id: string) {
-    try {
-      const teamData = await this.teamService.restoreTeam(id);
-      return response.status(HttpStatus.OK).json({
-        message: 'Team successfully restored', teamData,
-      });
-    } catch (err) {
-      return response.status(err.status).json(err.response);
-    }
+  restoreTeam(@Param('id') id: string) {
+    return this.teamService.restoreTeam(id);
   }
 
 }
