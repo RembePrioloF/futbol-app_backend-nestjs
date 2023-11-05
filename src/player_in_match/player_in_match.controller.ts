@@ -17,7 +17,9 @@ export class PlayerInMatchController implements OnModuleInit {
   async onModuleInit() {
     try {
       const players = await this.playerService.findAllPlayer();
-      this.playerEmailsList = players.map(player => player.email);
+      if (players) {
+        this.playerEmailsList = players.map(player => player.email);
+      }
     } catch (error) {
       console.error('Error al cargar la lista de jugadores:', error);
     }

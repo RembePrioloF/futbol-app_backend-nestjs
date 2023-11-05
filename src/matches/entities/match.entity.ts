@@ -15,8 +15,11 @@ export class Match {
   @Column({ type: 'date' })
   dateMatch: Date;
 
-  @Column()
+  @Column({ nullable: true })
   field: string;
+
+  @Column({ nullable: true })
+  referee: string;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;

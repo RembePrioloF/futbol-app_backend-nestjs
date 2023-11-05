@@ -39,9 +39,8 @@ export class PlayerService {
       const age = presentDate.getFullYear() - birthDateObj.getFullYear();
       // Verifica si el jugador tiene al menos 18 años
       if (age < 18 && league === 'VETERANO') {
-        throw new BadRequestException(`el jugador: ${name}. es menor de edad y no puede unirse a una liga de adultos.`);
+        throw new BadRequestException(`El jugador: ${name}. es menor de edad y no puede unirse a una liga de adultos.`);
       }
-      // Crea un nuevo jugador
       const newPlayer = this.playerRepository.create({
         ...playerDto,
         playerId: short(),
