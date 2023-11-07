@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
 import { TeamService } from 'src/teams/team.service';
 import { Repository } from 'typeorm';
-import { TournamService } from '../tournaments/tournam.service';
 import { MatchDto } from './dto';
 import { Match } from './entities/Match.entity';
 
@@ -13,14 +12,12 @@ export class MatchService {
   constructor(
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
-    private readonly tournamService: TournamService,
     private readonly teamService: TeamService,
   ) { }
 
   async createMatch(matchDto: MatchDto): Promise<Match> {
-    const { dateMatch, localTeam, visitingTeam, tournam } = matchDto;
+    const { dateMatch, localTeam, visitingTeam } = matchDto;
 
-    await this.tournamService.findTournamById(String(tournam));
     await this.teamService.findTeamById(String(localTeam));
     await this.teamService.findTeamById(String(visitingTeam));
     if (matchDto.localTeam === matchDto.visitingTeam) {
@@ -52,7 +49,7 @@ export class MatchService {
   async findMatchById(id: string): Promise<Match> {
     const existingMatch = await this.matchRepository.findOne({
       where: { id: id.toString() },
-      relations: ['localTeam', 'visitingTeam', 'tournam'],
+      relations: ['localTeam', 'visitingTeam'],
     });
     if (!existingMatch) {
       throw new NotFoundException(`Partido no encontrado`);

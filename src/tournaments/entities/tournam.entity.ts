@@ -41,8 +41,8 @@ export class Tournam {
     @OneToMany(() => Team, (team) => team.tournam)
     teams: Team[];
 
-    @OneToMany(() => Match, (match) => match.tournam)
-    matchs: Match[];
+    /* @OneToMany(() => Match, (match) => match.tournam)
+    matchs: Match[]; */
 
     @OneToMany(() => Participation, (participation) => participation.tournam)
     participations: Participation[];

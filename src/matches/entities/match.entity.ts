@@ -1,7 +1,6 @@
 import { PlayerInMatch } from 'src/player_in_match/entities/player_in_match.entity';
 import { Player } from 'src/players/entities/player.entity';
 import { Team } from 'src/teams/entities/team.entity';
-import { Tournam } from 'src/tournaments/entities/tournam.entity';
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 @Entity('matches')
@@ -12,7 +11,10 @@ export class Match {
   @PrimaryGeneratedColumn('uuid')
   id: string; // Esta será la clave primaria artificial
 
-  @Column({ type: 'date' })
+  @Column()
+  index: number;
+
+  @Column({ type: 'timestamp' })
   dateMatch: Date;
 
   @Column({ nullable: true })
@@ -29,10 +31,6 @@ export class Match {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deleteAt: Date;
-
-  @ManyToOne(() => Tournam, (tournam) => tournam.matchs)
-  @JoinColumn({ name: 'tournamId' })
-  tournam: Tournam;
 
   @ManyToOne(() => Team, (team) => team.localTeam)
   @JoinColumn({ name: 'localTeamId', referencedColumnName: 'teamId' })

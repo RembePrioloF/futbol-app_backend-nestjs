@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { MatchDto } from './dto';
 import { MatchService } from './match.service';
 
@@ -12,27 +12,27 @@ export class MatchController {
   }
 
   @Get()
-   findAllMatch() {
+  findAllMatch() {
     return this.matchService.findAllMatch();
   }
 
   @Get('/:id')
-   findMatchById( @Param('id') id: string) {
+  findMatchById(@Param('id') id: string) {
     return this.matchService.findMatchById(id);
   }
 
   @Put('/:id')
-   updateMatch( @Param('id') id: string, @Body() matchDto: MatchDto) {
+  updateMatch(@Param('id') id: string, @Body() matchDto: MatchDto) {
     return this.matchService.updateMatch(id, matchDto);
   }
 
   @Delete('/:id')
-   deleteMatch(@Param('id') id: string) {
+  deleteMatch(@Param('id') id: string) {
     return this.matchService.deleteMatch(id);
   }
 
   @Patch('/restore/:id')
-   restoreMatchent( @Param('id') id: string) {
+  restoreMatchent(@Param('id') id: string) {
     return this.matchService.restoreMatchent(id);
   }
 
