@@ -45,7 +45,7 @@ export class TournamService {
   async findTournamById(id: string): Promise<Tournam> {
     const existingTournam = await this.tournamRepository.findOne({
       where: { tournamId: id.toString() },
-      relations: ['participations', 'teams'],
+      relations: ['teams', 'matchs'],
     });
     if (!existingTournam) {
       throw new NotFoundException(`El Torneo: ${id} no encontrado.`);

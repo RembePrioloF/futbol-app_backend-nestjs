@@ -1,5 +1,4 @@
 import { Match } from "src/matches/entities/match.entity";
-import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
 import { Tournam } from "src/tournaments/entities/tournam.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -40,8 +39,5 @@ export class Team {
 
   @OneToMany(() => Match, (match) => match.visitingTeam)
   visitingTeam: Match[];
-
-  @OneToMany(() => Participation, (participation) => participation.team)
-  participations: Participation[];
 
 }

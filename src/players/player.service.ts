@@ -28,9 +28,6 @@ export class PlayerService {
         if (existingPlayer.email === email) {
           throw new BadRequestException(`Ya existe un jugador con el correo electrónico: ${email}.`);
         }
-        if (existingPlayer.playerNumber === playerNumber) {
-          throw new BadRequestException(`El Número del Jugador: ${playerNumber} ¡ya existe!`)
-        }
       }
       const birthDateObj = new Date(birthDate);
       // Calcula la fecha actual
@@ -51,6 +48,9 @@ export class PlayerService {
       if (error instanceof BadRequestException) {
         // El jugador ya existe, relanzar la excepción
         throw error;
+      }
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException(`El Número ' ${playerNumber} ' ya está asignado`)
       } else {
         // Ocurrió un error interno
         throw new InternalServerErrorException('Something terrible happened while creating the player.');

@@ -5,6 +5,7 @@ import { TeamService } from 'src/teams/team.service';
 import { Repository } from 'typeorm';
 import { MatchDto } from './dto';
 import { Match } from './entities/Match.entity';
+import { TournamService } from 'src/tournaments/tournam.service';
 
 @Injectable()
 export class MatchService {
@@ -13,11 +14,12 @@ export class MatchService {
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
     private readonly teamService: TeamService,
+    private readonly tournamService: TournamService,
   ) { }
 
   async createMatch(matchDto: MatchDto): Promise<Match> {
-    const { dateMatch, localTeam, visitingTeam } = matchDto;
-
+    const { dateMatch, localTeam, visitingTeam, tournam } = matchDto;
+    await this.tournamService.findTournamById(String(tournam));
     await this.teamService.findTeamById(String(localTeam));
     await this.teamService.findTeamById(String(visitingTeam));
     if (matchDto.localTeam === matchDto.visitingTeam) {
@@ -39,7 +41,9 @@ export class MatchService {
   }
 
   async findAllMatch(): Promise<Match[]> {
-    const matchData = await this.matchRepository.find();
+    const matchData = await this.matchRepository.find({
+      relations: ['localTeam.players', 'visitingTeam.players', 'tournam'],
+    });
     if (!matchData || matchData.length == 0) {
       throw new NotFoundException('Matchents data not found!');
     }
@@ -49,7 +53,7 @@ export class MatchService {
   async findMatchById(id: string): Promise<Match> {
     const existingMatch = await this.matchRepository.findOne({
       where: { id: id.toString() },
-      relations: ['localTeam', 'visitingTeam'],
+      relations: ['localTeam.players', 'visitingTeam.players'],
     });
     if (!existingMatch) {
       throw new NotFoundException(`Partido no encontrado`);

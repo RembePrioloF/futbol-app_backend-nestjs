@@ -34,7 +34,9 @@ export class TeamService {
   }
 
   async findAllTeam(): Promise<Team[]> {
-    const teamData = await this.teamRepository.find();
+    const teamData = await this.teamRepository.find({
+      relations: ['tournam'],
+    });
     if (!teamData || teamData.length == 0) {
       throw new NotFoundException('¡No se han encontrado datos de equipos!');
     }
@@ -47,7 +49,7 @@ export class TeamService {
       relations: ['tournam', 'players'],
     });
     if (!existingTeam)
-      throw new NotFoundException(`El Equipo: ${id} no encontrado`);
+      throw new NotFoundException(`Equipo: ${id} no encontrado`);
     return existingTeam;
   }
 

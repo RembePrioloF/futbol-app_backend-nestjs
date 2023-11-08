@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, HttpStatus, OnModuleInit, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { PlayerService } from 'src/players/player.service';
 import { transporter } from '../../config/mailer';
-import { PlayerInMatchDto } from './dto';
+import { MatchEvent, PlayerInMatchDto } from './dto';
 import { PlayerInMatchService } from './player_in_match.service';
 
 @Controller('player_in_match')
@@ -70,6 +70,12 @@ export class PlayerInMatchController implements OnModuleInit {
         });
       }
     }
+  }
+
+  // Ruta para obtener los valores del enum
+  @Get('/match_event')
+  getMatchEvent() {
+    return Object.values(MatchEvent);
   }
 
   @Post()

@@ -1,6 +1,5 @@
 import { User } from "src/auth/entities/user.entity";
 import { Match } from "src/matches/entities/match.entity";
-import { Participation } from "src/participation/entities/participation.entity";
 import { Player } from "src/players/entities/player.entity";
 import { Team } from "src/teams/entities/team.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -38,14 +37,11 @@ export class Tournam {
     @DeleteDateColumn({ type: 'timestamp' })
     deleteAt: Date;
 
+    @OneToMany(() => Match, (match) => match.tournam)
+    matchs: Match[];
+
     @OneToMany(() => Team, (team) => team.tournam)
     teams: Team[];
-
-    /* @OneToMany(() => Match, (match) => match.tournam)
-    matchs: Match[]; */
-
-    @OneToMany(() => Participation, (participation) => participation.tournam)
-    participations: Participation[];
 
     @ManyToMany(() => Player, (player) => player.matchs)
     players: Player[];
