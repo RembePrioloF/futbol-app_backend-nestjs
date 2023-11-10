@@ -71,7 +71,7 @@ export class PlayerService {
   async findPlayerById(id: string): Promise<Player> {
     const existingPlayer = await this.playerRepository.findOne({
       where: { playerId: id.toString() },
-      relations: ['team.participations.tournam', 'playerInMatches'],
+      relations: ['team.tournam', 'playerInMatches'],
     });
     if (!existingPlayer) {
       throw new NotFoundException(`Jugador no encontrado`);
