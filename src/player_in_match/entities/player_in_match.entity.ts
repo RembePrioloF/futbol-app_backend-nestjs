@@ -1,10 +1,10 @@
 import { Match } from 'src/matches/entities/match.entity';
 import { Player } from 'src/players/entities/player.entity';
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import { Tournam } from 'src/tournaments/entities/tournam.entity';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { MatchEvent } from '../dto';
 
 @Entity('players_in_matches')
-@Unique(['player', 'createdAt']) // Añadir un índice único para evitar duplicados
 export class PlayerInMatch {
 
   @PrimaryGeneratedColumn('uuid')
@@ -30,5 +30,8 @@ export class PlayerInMatch {
 
   @ManyToOne(() => Match, (match) => match.playerInMatches)
   match: Match;
+
+  @ManyToOne(() => Tournam, (tournam) => tournam.playerInMatches)
+  tournam: Tournam;
 
 }

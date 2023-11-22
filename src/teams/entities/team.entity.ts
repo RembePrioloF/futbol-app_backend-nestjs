@@ -19,6 +19,9 @@ export class Team {
   @Column({ nullable: true })
   coach: string;
 
+  @Column({ default: false })
+  winner: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;
 

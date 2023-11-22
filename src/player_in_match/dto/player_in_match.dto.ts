@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { Match } from 'src/matches/entities/match.entity';
 import { Player } from 'src/players/entities/player.entity';
+import { Tournam } from 'src/tournaments/entities/tournam.entity';
 
 export class PlayerInMatchDto {
 
@@ -19,5 +20,9 @@ export class PlayerInMatchDto {
     @IsString()
     @IsNotEmpty()
     match: Match;
+
+    @IsString()
+    @IsNotEmpty()
+    tournam: Tournam;
 
 } 

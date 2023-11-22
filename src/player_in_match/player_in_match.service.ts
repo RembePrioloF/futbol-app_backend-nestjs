@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { generate as short } from 'short-uuid';
 import { MatchService } from 'src/matches/match.service';
 import { PlayerService } from 'src/players/player.service';
+import { TournamService } from 'src/tournaments/tournam.service';
 import { Repository } from 'typeorm';
 import { PlayerInMatchDto } from './dto';
 import { PlayerInMatch } from './entities/player_in_match.entity';
@@ -15,9 +16,11 @@ export class PlayerInMatchService {
     private readonly playerInMatchRepository: Repository<PlayerInMatch>,
     private readonly matchService: MatchService,
     private readonly playerService: PlayerService,
+    private readonly tournamService: TournamService,
   ) { }
 
   async createPlayerInMatch(matchDto: PlayerInMatchDto): Promise<PlayerInMatch> {
+    await this.tournamService.findTournamById(String(matchDto.tournam));
     await this.matchService.findMatchById(String(matchDto.match));
     await this.playerService.findPlayerById(String(matchDto.player));
     try {

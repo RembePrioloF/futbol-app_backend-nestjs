@@ -5,6 +5,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
 import { TournamDto } from './dto';
 import { Tournam } from './entities/tournam.entity';
+import { log } from 'console';
 
 @Injectable()
 export class TournamService {
@@ -45,12 +46,26 @@ export class TournamService {
   async findTournamById(id: string): Promise<Tournam> {
     const existingTournam = await this.tournamRepository.findOne({
       where: { tournamId: id.toString() },
-      relations: ['teams', 'matchs'],
+      relations: [
+        'teams',
+        'matchs.localTeam.players.playerInMatches',
+        'matchs.visitingTeam.players.playerInMatches',
+        'playerInMatches.player.team'],
+        order: {
+          matchs: {
+            createdAt: "ASC"
+          },
+          teams: {
+            createdAt: "ASC"
+          }
+      }
     });
     if (!existingTournam) {
       throw new NotFoundException(`El Torneo: ${id} no encontrado.`);
     }
+
     return existingTournam;
+  
   }
 
   async updateTournam(id: string, tournamData: Partial<Tournam>): Promise<Tournam | undefined> {

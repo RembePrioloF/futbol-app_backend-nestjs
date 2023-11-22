@@ -1,5 +1,6 @@
 import { User } from "src/auth/entities/user.entity";
 import { Match } from "src/matches/entities/match.entity";
+import { PlayerInMatch } from "src/player_in_match/entities/player_in_match.entity";
 import { Player } from "src/players/entities/player.entity";
 import { Team } from "src/teams/entities/team.entity";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
@@ -46,6 +47,10 @@ export class Tournam {
     @ManyToMany(() => Player, (player) => player.matchs)
     players: Player[];
 
+    @OneToMany(() => PlayerInMatch, (playerInMatch) => playerInMatch.tournam)
+    playerInMatches: PlayerInMatch[];
+
     @ManyToOne(() => User, (user) => user.tournaments)
     user: User;
+
 }

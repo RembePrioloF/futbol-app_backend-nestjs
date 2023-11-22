@@ -4,10 +4,6 @@ import { Tournam } from 'src/tournaments/entities/tournam.entity';
 
 export class MatchDto {
 
-    @IsNumber()
-    @IsNotEmpty()
-    index: number;
-
     @IsString()
     @IsNotEmpty()
     dateMatch: Date;

@@ -54,6 +54,7 @@ export class TeamService {
   }
 
   async updateTeam(id: string, teamData: Partial<Team>): Promise<Team | undefined> {
+    await this.tournamService.findTournamById(String(teamData.tournam));
     const existingTeam = await this.teamRepository.findOne({ where: { teamId: id.toString() } });
     if (!existingTeam) {
       throw new NotFoundException(`El Equipo: ${id} no encontrado`);

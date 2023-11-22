@@ -38,7 +38,8 @@ export class PlayerInMatchController implements OnModuleInit {
       await new Promise((resolve, reject) => {
         transporter.sendMail({
           from: '"TournApp" <rembepriolo@gmail.com>',
-          to: 'rembepriolo@hotmail.com', //to: playerEmails.join(','), 
+          //to: 'rembepriolo@hotmail.com', 
+          to: playerEmails.join(','),
           subject: 'Notificación Estadísticas del Jugador ✔',
           text: 'Las Estadísticas del Jugador',
           html: htmlTemplate

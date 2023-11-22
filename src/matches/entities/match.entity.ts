@@ -12,9 +12,6 @@ export class Match {
   @PrimaryGeneratedColumn('uuid')
   id: string; // Esta será la clave primaria artificial
 
-  @Column()
-  index: number;
-
   @Column({ type: 'timestamp' })
   dateMatch: Date;
 
