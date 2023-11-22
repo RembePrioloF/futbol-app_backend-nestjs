@@ -50,7 +50,8 @@ export class TournamService {
         'teams',
         'matchs.localTeam.players.playerInMatches',
         'matchs.visitingTeam.players.playerInMatches',
-        'playerInMatches.player.team'],
+        'playerInMatches.player.team',
+        'playerInMatches.match'],
         order: {
           matchs: {
             createdAt: "ASC"

@@ -21,6 +21,12 @@ export class Match {
   @Column({ nullable: true })
   referee: string;
 
+  @Column({ default: 'cuartos de final' })
+  typeMatch: string;
+ 
+  @Column({ default: false })
+  endMatch: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt: Date;
 
